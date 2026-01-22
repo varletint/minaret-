@@ -7,11 +7,7 @@ export interface IMosque extends Document {
   email: string;
   password: string;
   slug: string;
-  location?: {
-    city?: string;
-    country?: string;
-    address?: string;
-  };
+  location: string;
   contactPhone?: string;
   isActive: boolean;
   createdAt: Date;
@@ -49,9 +45,8 @@ const mosqueSchema = new Schema<IMosque>(
       trim: true,
     },
     location: {
-      city: String,
-      country: String,
-      address: String,
+      type: String,
+      lowercase: true,
     },
     contactPhone: {
       type: String,
@@ -68,12 +63,11 @@ const mosqueSchema = new Schema<IMosque>(
 );
 
 // Hash password before saving
-mosqueSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+mosqueSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 // Compare password method
@@ -84,14 +78,13 @@ mosqueSchema.methods.comparePassword = async function (
 };
 
 // Generate slug from name before validation
-mosqueSchema.pre("validate", function (next) {
+mosqueSchema.pre("validate", function () {
   if (this.isModified("name") && !this.slug) {
     this.slug = this.name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
   }
-  next();
 });
 
 export const Mosque = mongoose.model<IMosque>("Mosque", mosqueSchema);
