@@ -27,7 +27,6 @@ export async function authenticate(
   next: NextFunction
 ): Promise<void> {
   try {
-    // Get token from header
     const authHeader = req.headers.authorization;
     let token: string | undefined;
 
@@ -39,10 +38,8 @@ export async function authenticate(
       throw UnauthorizedError("Access token required");
     }
 
-    // Verify token
     const decoded = jwt.verify(token, env.jwtSecret) as JwtPayload;
 
-    // Get mosque from database
     const mosque = await Mosque.findById(decoded.id);
     if (!mosque) {
       throw UnauthorizedError("Mosque not found");
@@ -52,7 +49,6 @@ export async function authenticate(
       throw UnauthorizedError("Account is deactivated");
     }
 
-    // Attach mosque to request
     req.mosque = mosque;
     req.mosqueId = decoded.id;
 
@@ -68,7 +64,6 @@ export async function authenticate(
   }
 }
 
-// Optional authentication - doesn't fail if no token
 export async function optionalAuth(
   req: Request,
   _res: Response,
@@ -87,7 +82,6 @@ export async function optionalAuth(
     }
     next();
   } catch {
-    // Silently continue without auth
     next();
   }
 }
