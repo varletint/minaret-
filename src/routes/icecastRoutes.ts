@@ -8,7 +8,7 @@ const router = Router();
  * Icecast Webhook Routes
  *
  * These endpoints are called by Icecast server.
- * Configure in icecast.xml:
+ * Configure in icecast.xml
  *
  * <authentication type="url">
  *   <option name="mount_add" value="http://your-api/api/v1/icecast/mount-add"/>
