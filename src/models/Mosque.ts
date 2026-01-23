@@ -77,7 +77,6 @@ mosqueSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Generate slug from name before validation
 mosqueSchema.pre("validate", function () {
   if (this.isModified("name") && !this.slug) {
     this.slug = this.name
