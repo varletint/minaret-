@@ -86,7 +86,7 @@ const stationSchema = new Schema<IStation>(
       },
       format: {
         type: String,
-        default: "mp3",
+        default: "ogg",
         enum: ["mp3", "ogg", "aac"],
       },
       isPublic: {
