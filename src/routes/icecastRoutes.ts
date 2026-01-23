@@ -1,0 +1,39 @@
+import { Router } from "express";
+import { asyncHandler } from "../middleware/index.js";
+import * as icecastController from "../controllers/icecastController.js";
+
+const router = Router();
+
+/**
+ * Icecast Webhook Routes
+ *
+ * These endpoints are called by Icecast server.
+ * Configure in icecast.xml:
+ *
+ * <authentication type="url">
+ *   <option name="mount_add" value="http://your-api/api/v1/icecast/mount-add"/>
+ *   <option name="mount_remove" value="http://your-api/api/v1/icecast/mount-remove"/>
+ *   <option name="listener_add" value="http://your-api/api/v1/icecast/listener-add"/>
+ *   <option name="listener_remove" value="http://your-api/api/v1/icecast/listener-remove"/>
+ * </authentication>
+ */
+
+// POST /api/v1/icecast/mount-add - Broadcaster connects
+router.post("/mount-add", asyncHandler(icecastController.onMountAdd));
+
+// POST /api/v1/icecast/mount-remove - Broadcaster disconnects
+router.post("/mount-remove", asyncHandler(icecastController.onMountRemove));
+
+// POST /api/v1/icecast/listener-add - Listener connects
+router.post("/listener-add", asyncHandler(icecastController.onListenerAdd));
+
+// POST /api/v1/icecast/listener-remove - Listener disconnects
+router.post(
+  "/listener-remove",
+  asyncHandler(icecastController.onListenerRemove)
+);
+
+// POST /api/v1/icecast/source-auth - Authenticate source before connection
+router.post("/source-auth", asyncHandler(icecastController.sourceAuth));
+
+export default router;

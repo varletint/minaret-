@@ -1,3 +1,3 @@
-export * from "./auth.schema.js";
-export * from "./station.schema.js";
-export * from "./show.schema.js";
+export * from "./authSchema.js";
+export * from "./stationSchema.js";
+export * from "./showSchema.js";

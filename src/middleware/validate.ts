@@ -15,8 +15,8 @@ export function validate(
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const messages = error.errors.map(
-          (err) => `${err.path.join(".")}: ${err.message}`
+        const messages = error.issues.map(
+          (issue) => `${issue.path.join(".")}: ${issue.message}`
         );
         throw BadRequestError(messages.join(", "));
       }

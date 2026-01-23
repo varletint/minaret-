@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { env } from "../config/env.js";
 
 interface TokenPayload {
@@ -9,14 +9,14 @@ interface TokenPayload {
 export function generateAccessToken(mosqueId: string): string {
   return jwt.sign({ id: mosqueId } as TokenPayload, env.jwtSecret, {
     expiresIn: env.jwtExpiresIn,
-  });
+  } as SignOptions);
 }
 
 // Generate refresh token (long-lived)
 export function generateRefreshToken(mosqueId: string): string {
   return jwt.sign({ id: mosqueId } as TokenPayload, env.jwtSecret, {
     expiresIn: env.refreshTokenExpiresIn,
-  });
+  } as SignOptions);
 }
 
 // Verify refresh token

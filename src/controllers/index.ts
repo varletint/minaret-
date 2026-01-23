@@ -1,3 +1,4 @@
-export * from "./auth.controller.js";
-export * from "./station.controller.js";
-export * from "./show.controller.js";
+export * from "./authController.js";
+export * from "./stationController.js";
+export * from "./showController.js";
+export * from "./icecastController.js";

@@ -25,6 +25,10 @@ export interface IStation extends Document {
     peakListeners: number;
     totalBroadcastMinutes: number;
   };
+  icecastCredentials?: {
+    username: string;
+    password: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -104,6 +108,13 @@ const stationSchema = new Schema<IStation>(
         default: 0,
       },
     },
+    icecastCredentials: {
+      username: String,
+      password: {
+        type: String,
+        select: false,
+      },
+    },
   },
   {
     timestamps: true,
@@ -111,7 +122,7 @@ const stationSchema = new Schema<IStation>(
 );
 
 // Generate slug and mount point before validation
-stationSchema.pre("validate", function (next) {
+stationSchema.pre("validate", function () {
   if (this.isModified("name") && !this.slug) {
     this.slug = this.name
       .toLowerCase()
@@ -123,11 +134,8 @@ stationSchema.pre("validate", function (next) {
   if (!this.mountPoint && this.slug) {
     this.mountPoint = `/${this.slug}`;
   }
-
-  next();
 });
 
-// Index for finding stations by mosque
 stationSchema.index({ mosqueId: 1, slug: 1 });
 
 export const Station = mongoose.model<IStation>("Station", stationSchema);

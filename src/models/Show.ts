@@ -69,7 +69,7 @@ const showSchema = new Schema<IShow>(
         type: String,
         enum: ["daily", "weekly", "monthly"],
       },
-      daysOfWeek: [Number], // 0-6
+      daysOfWeek: [Number],
       dayOfMonth: Number,
     },
     isLive: {
@@ -91,11 +91,10 @@ const showSchema = new Schema<IShow>(
 );
 
 // Validate end time is after start time
-showSchema.pre("validate", function (next) {
+showSchema.pre("validate", function () {
   if (this.scheduledEnd <= this.scheduledStart) {
     this.invalidate("scheduledEnd", "End time must be after start time");
   }
-  next();
 });
 
 // Indexes for querying shows

@@ -54,7 +54,7 @@ export function errorHandler(
     stack = err.stack;
   }
 
-  console.error(`[${new Date().toISOString()}] Error:`, err.message);
+  // console.error(`[${new Date().toISOString()}] Error:`, err.message);
   if (stack) console.error(stack);
 
   res.status(statusCode).json({

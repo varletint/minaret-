@@ -6,14 +6,34 @@ import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
 import { connectDB } from "./config/db.js";
 import { errorHandler } from "./middleware/index.js";
-import { authRoutes, stationRoutes, showRoutes } from "./routes/index.js";
+import {
+  authRoutes,
+  stationRoutes,
+  showRoutes,
+  searchRoutes,
+  icecastRoutes,
+} from "./routes/index.js";
 
 const app = express();
 
 app.use(helmet());
+const allowedOrigins = [
+  "http://10.209.0.108:5173",
+  "http://localhost:5173",
+  process.env.CLIENT_URL,
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -35,6 +55,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1", authRoutes); // For /api/v1/me
 app.use("/api/v1/stations", stationRoutes);
 app.use("/api/v1/shows", showRoutes);
+app.use("/api/v1/search", searchRoutes);
+app.use("/api/v1/icecast", icecastRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
