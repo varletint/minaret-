@@ -90,14 +90,12 @@ const showSchema = new Schema<IShow>(
   }
 );
 
-// Validate end time is after start time
 showSchema.pre("validate", function () {
   if (this.scheduledEnd <= this.scheduledStart) {
     this.invalidate("scheduledEnd", "End time must be after start time");
   }
 });
 
-// Indexes for querying shows
 showSchema.index({ stationId: 1, scheduledStart: 1 });
 showSchema.index({ scheduledStart: 1, scheduledEnd: 1 });
 
