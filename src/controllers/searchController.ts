@@ -79,7 +79,7 @@ export async function search(req: Request, res: Response): Promise<void> {
     ]);
   }
 
-  // Search shows
+  // Search Shows
   if (searchShows) {
     const showQuery = {
       $or: [
