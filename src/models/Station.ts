@@ -130,7 +130,6 @@ stationSchema.pre("validate", function () {
       .replace(/^-+|-+$/g, "");
   }
 
-  // auto generate mount point from slug if not set
   if (!this.mountPoint && this.slug) {
     this.mountPoint = `/${this.slug}`;
   }
