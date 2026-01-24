@@ -62,7 +62,6 @@ const mosqueSchema = new Schema<IMosque>(
   }
 );
 
-// Hash password before saving
 mosqueSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
 
