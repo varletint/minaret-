@@ -198,7 +198,7 @@ export async function goLive(req: Request, res: Response): Promise<void> {
     const crypto = await import("crypto");
     station.icecastCredentials = {
       username: `source_${station.slug}`,
-      password: crypto.randomBytes(16).toString("hex"),
+      password: crypto.randomBytes(3).toString("hex"),
     };
   }
 
