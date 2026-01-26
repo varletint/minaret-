@@ -22,14 +22,15 @@
         <burst-size>65535</burst-size>
     </limits>
 
+    <!--
     <authentication>
-        <!-- REQUIRED for source protocol handshake -->
         <source-user>source</source-user>
         <source-password>hackme</source-password>
         
         <admin-user>admin</admin-user>
         <admin-password>hackme</admin-password>
-    </authentication>
+    </authentication> 
+    -->
 
     <listen-socket>
         <port>8000</port>
@@ -50,10 +51,8 @@
             <role type="url" 
                   match-method="source,put"
                   allow-web="*" 
-                  deny-admin="*" 
                   may-alter="send_error,redirect">
                 <option name="client_add" value="http://localhost:3000/api/v1/icecast/source-auth"/>
-                <option name="header_prefix" value="IcecastHeader."/>
             </role>
 
             <!-- Listener Role: For web players and checks -->
@@ -65,7 +64,6 @@
                   may-alter="send_error,redirect">
                 <!-- IMPORTANT: Point to listener-auth, NOT source-auth -->
                 <option name="client_add" value="http://localhost:3000/api/v1/icecast/listener-auth"/>
-                <option name="header_prefix" value="IcecastHeader."/>
             </role>
             
             <role type="anonymous" deny-all="*" />
