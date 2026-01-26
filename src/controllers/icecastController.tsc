@@ -1,0 +1,183 @@
+import { Request, Response } from "express";
+import { Station } from "../models/Station.js";
+
+const ICECAST_SECRET = process.env.ICECAST_SECRET || "super_secret";
+
+/**
+ * Handle Icecast source authentication
+ */
+export async function sourceAuth(req: Request, res: Response) {
+  try {
+    const token = req.query.token;
+    // if (token !== ICECAST_SECRET) {
+    //   console.warn("[Icecast] Invalid token attempt");
+    //   //   return res.status(403).end();
+    // }
+
+    const { user, pass, mount, ip, agent } = req.body;
+
+    console.log("[Icecast Source Auth]", { mount, user, ip, agent });
+
+    if (!mount || !user) {
+      console.log(
+        "[Icecast] Missing mount or user, but allowing handshake step"
+      );
+      // res.setHeader("icecast-auth-user", "1");
+      return res.status(200).end();
+    }
+
+    const mountPoint = mount.startsWith("/") ? mount : `/${mount}`;
+
+    // Select station with credentials
+    const station = await Station.findOne({ mountPoint }).select(
+      "+icecastCredentials.password +icecastCredentials.username"
+    );
+
+    if (!station || !station.icecastCredentials) {
+      console.warn(`[Icecast] No station found for mount ${mountPoint}`);
+      return res.status(403).end();
+    }
+
+    if (station.icecastCredentials.password === pass) {
+      console.log(`[Icecast] SOURCE AUTH OK: ${mountPoint} (User: ${user})`);
+
+      // Standard Icecast URL Auth Success
+      res.setHeader("icecast-auth-user", "1");
+      return res.status(200).end();
+    }
+
+    console.warn(`[Icecast] SOURCE AUTH FAIL: ${mountPoint}`);
+    return res.status(403).end();
+  } catch (error) {
+    console.error("[Icecast] Source Auth Error:", error);
+    return res.status(500).end();
+  }
+}
+
+/**
+ * Handle Icecast listener authentication
+ */
+export async function listenerAuth(req: Request, res: Response) {
+  try {
+    const token = req.query.token;
+    if (token !== ICECAST_SECRET) return res.status(403).end();
+
+    const { mount, ip, agent } = req.body;
+    if (
+      mount.startsWith("/assets") ||
+      mount.startsWith("/admin") ||
+      mount === "/status.xsl" ||
+      mount === "/favicon.ico"
+    ) {
+      // res.setHeader("icecast-auth-user", "1");
+      return res.status(200).end();
+    }
+
+    console.log("[Icecast Listener Auth]", { mount, ip, agent });
+
+    const mountPoint = mount.startsWith("/") ? mount : `/${mount}`;
+
+    const station = await Station.findOne({ mountPoint });
+
+    // if (!station || !station.isPublic) {
+    //   console.warn(
+    //     `[Icecast] Listener blocked or station not public: ${mountPoint}`
+    //   );
+    //   return res.status(403).end();
+    // }
+
+    // Allow listener
+    // res.setHeader("icecast-auth-user", "1");
+    return res.status(200).send("OK");
+  } catch (error) {
+    console.error("[Icecast] Listener Auth Error:", error);
+    return res.status(500).end();
+  }
+}
+
+/**
+ * Handle mount point addition event
+ */
+export async function mountAdd(req: Request, res: Response) {
+  try {
+    const { mount, ip } = req.body;
+
+    console.log(`[Icecast EVENT] Source connected → ${mount} (${ip})`);
+
+    await Station.updateOne(
+      { mountPoint: mount },
+      { $set: { isLive: true, lastConnectedAt: new Date() } }
+    );
+
+    res.status(200).send("OK");
+  } catch (error) {
+    console.error(`[Icecast] Error in mountAdd for ${req.body.mount}:`, error);
+    res.status(500).end();
+  }
+}
+
+/**
+ * Handle mount point removal event
+ */
+export async function mountRemove(req: Request, res: Response) {
+  try {
+    const { mount, ip } = req.body;
+
+    console.log(`[Icecast EVENT] Source disconnected → ${mount} (${ip})`);
+
+    await Station.updateOne(
+      { mountPoint: mount },
+      { $set: { isLive: false, lastDisconnectedAt: new Date() } }
+    );
+
+    res.status(200).send("OK");
+  } catch (error) {
+    console.error(
+      `[Icecast] Error in mountRemove for ${req.body.mount}:`,
+      error
+    );
+    res.status(500).end();
+  }
+}
+
+/**
+ * Handle listener join event
+ */
+export async function listenerAdd(req: Request, res: Response) {
+  try {
+    const { mount, ip } = req.body;
+
+    console.log(`[Icecast EVENT] Listener joined ${mount} from ${ip}`);
+
+    await Station.updateOne({ mountPoint: mount }, { $inc: { listeners: 1 } });
+
+    res.status(200).send("OK");
+  } catch (error) {
+    console.error(
+      `[Icecast] Error in listenerAdd for ${req.body.mount}:`,
+      error
+    );
+    res.status(500).end();
+  }
+}
+
+/**
+ * Handle listener leave event
+ */
+export async function listenerRemove(req: Request, res: Response) {
+  try {
+    const { mount, ip } = req.body;
+
+    console.log(`[Icecast EVENT] Listener left ${mount} from ${ip}`);
+
+    await Station.updateOne({ mountPoint: mount }, { $inc: { listeners: -1 } });
+
+    res.status(200).send("OK");
+  } catch (error) {
+    console.error(
+      `[Icecast] Error in listenerRemove for ${req.body.mount}:`,
+      error
+    );
+    res.status(500).end();
+  }
+}
