@@ -1,11 +1,5 @@
 import { Request, Response } from "express";
-
-/**
- * Icecast Authentication Controller
- *
- * Handles dynamic authentication for Icecast sources and listeners
- * via URL-based authentication roles.
- */
+import { Station } from "../models/Station";
 
 interface IcecastAuthParams {
   action?: string;
@@ -20,87 +14,29 @@ interface IcecastAuthParams {
 }
 
 export class IcecastAuthController {
-  /**
-   * Source Authentication
-   * Called when a broadcaster (BUTT, CoolMic, etc) tries to connect
-   *
-   * Icecast sends parameters as query strings:
-   * - action: "stream_auth" or "mount_add"
-   * - mount: mountpoint name (e.g., "/live")
-   * - user: username provided by source
-   * - pass: password provided by source
-   * - ip: source IP address
-   * - server: Icecast server
-   * - port: Icecast port
-   * - client: client ID
-   */
-  // async sourceAuth(req: Request, res: Response): Promise<void> {
-  //   console.log("=== SOURCE AUTH CALLED ===");
-  //   console.log("Body:", req.body);
-  //   console.log("Query:", req.query);
-  //   console.log("Headers:", req.headers);
-
-  //   try {
-  //     // Icecast sends data in POST body, not query string
-  //     const params: IcecastAuthParams = {
-  //       action: req.body.action as string,
-  //       mount: req.body.mount as string,
-  //       user: req.body.user as string,
-  //       pass: req.body.pass as string,
-  //       ip: req.body.ip as string,
-  //       server: req.body.server as string,
-  //       port: req.body.port as string,
-  //       client: req.body.client as string,
-  //     };
-
-  //     console.log("Source auth request:", params);
-
-  //     // YOUR AUTHENTICATION LOGIC HERE
-  //     // Example: Check credentials against database, API, etc.
-  //     const isValid = await this.validateSourceCredentials(
-  //       params.user,
-  //       params.pass,
-  //       params.mount
-  //     );
-
-  //     if (isValid) {
-  //       // CRITICAL: Return 200 status with Icecast-auth-user: 1
-  //       res.setHeader("Icecast-auth-user", "1");
-  //       res.setHeader("Icecast-auth-message", "Authentication successful");
-
-  //       // Optional: You can set custom headers for metadata
-  //       // res.setHeader('Icecast-auth-timelimit', '3600'); // Limit connection time
-
-  //       res.status(200).end();
-  //     } else {
-  //       // Return 403 for authentication failure
-  //       res.setHeader("Icecast-auth-user", "0");
-  //       res.setHeader("Icecast-auth-message", "Invalid credentials");
-  //       res.status(403).end();
-  //     }
-  //   } catch (error) {
-  //     console.error("Source auth error:", error);
-  //     res.setHeader("Icecast-auth-user", "0");
-  //     res.setHeader("Icecast-auth-message", "Server error");
-  //     res.status(500).end();
-  //   }
-  // }
-
   async sourceAuth(req: Request, res: Response) {
     try {
       console.log("Icecast Auth Request:", req.body);
 
       const { action, user, pass, mount } = req.body;
 
-      // 2. Validate the source (BUTT client)
-      // BUTT usually sends 'source' as the username by default
-      if (user === "test" && pass === "hackme") {
+      const station = await Station.findOne({ mountPoint: mount }).select(
+        "+icecastCredentials.password"
+      );
+
+      if (!station) {
+        console.log(`❌ Denied: No station found for mount ${mount}`);
+        res.setHeader("icecast-auth-user", "0");
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        return res.end("Mount not found");
+      }
+
+      const validUsername = station.icecastCredentials?.username === user;
+      const validPassword = station.icecastCredentials?.password === pass;
+
+      if (validUsername && validPassword) {
         console.log(`✅ Success: Authorizing ${user} for mount ${mount}`);
-
-        // 3. This header MUST match the 'auth_header' option in your icecast.xml
         res.setHeader("icecast-auth-user", "1");
-
-        // Use writeHead to ensure no other 'bloat' headers get in the way
         res.writeHead(200, { "Content-Type": "text/plain" });
         return res.end("OK");
       } else {
@@ -114,10 +50,7 @@ export class IcecastAuthController {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
-  /**
-   * Listener Authentication
-   * Called when a listener tries to connect to a stream
-   */
+
   async listenerAuth(req: Request, res: Response): Promise<void> {
     try {
       const params: IcecastAuthParams = {
@@ -132,21 +65,12 @@ export class IcecastAuthController {
 
       console.log("Listener auth request:", params);
 
-      // YOUR LISTENER VALIDATION LOGIC HERE
-      // Example: Check IP blacklist, concurrent connections, etc.
       const isAllowed = await this.validateListener(params.ip, params.mount);
-
-      // if (isAllowed) {
 
       res.setHeader("Icecast-auth-user", "1");
       res.setHeader("Icecast-auth-message", "Access granted");
       res.setHeader("Content-Type", "text/plain");
       res.status(200).send("Icecast-auth-user: 1");
-      // } else {
-      // res.setHeader("Icecast-auth-user", "0");
-      // res.setHeader("Icecast-auth-message", "Access denied");
-      // res.status(403).send("Access denied");
-      // }
     } catch (error) {
       console.error("Listener auth error:", error);
       res.setHeader("Icecast-auth-user", "0");
@@ -156,60 +80,23 @@ export class IcecastAuthController {
     }
   }
 
-  /**
-   * Validate source credentials
-   * Replace this with your actual authentication logic
-   */
   private async validateSourceCredentials(
     user?: string,
     pass?: string,
     mount?: string
   ): Promise<boolean> {
-    // EXAMPLE IMPLEMENTATION - Replace with your logic
-
-    // Option 1: Simple hardcoded check
-    // return user === 'broadcaster' && pass === 'secret123';
-
-    // Option 2: Database check
-    // const broadcaster = await db.broadcasters.findOne({ username: user });
-    // return broadcaster && await bcrypt.compare(pass, broadcaster.passwordHash);
-
-    // Option 3: Dynamic/token-based
-    // const tokenValid = await this.validateToken(pass);
-    // return tokenValid;
-
-    // For now, accept any credentials (like your no-auth setup)
     console.log(`Validating source: user=${user}, mount=${mount}`);
-    return true; // Change this to your actual validation
+    return true;
   }
 
-  /**
-   * Validate listener access
-   * Replace this with your actual validation logic
-   */
   private async validateListener(
     ip?: string,
     mount?: string
   ): Promise<boolean> {
-    // EXAMPLE IMPLEMENTATION - Replace with your logic
-
-    // Option 1: Check IP blacklist
-    // const isBlacklisted = await db.blacklist.exists({ ip });
-    // if (isBlacklisted) return false;
-
-    // Option 2: Check concurrent connections
-    // const connections = await this.getActiveConnections(ip);
-    // if (connections > 5) return false;
-
-    // For now, allow all listeners
     console.log(`Validating listener: ip=${ip}, mount=${mount}`);
-    return true; // Change this to your actual validation
+    return true;
   }
 
-  /**
-   * Mount Add Event
-   * Called when a source connects successfully
-   */
   async mountAdd(req: Request, res: Response): Promise<void> {
     try {
       const params = {
@@ -219,11 +106,6 @@ export class IcecastAuthController {
       };
 
       console.log("Mount added:", params);
-
-      // YOUR LOGIC HERE
-      // Example: Update database, send notifications, etc.
-      // await db.mounts.create({ name: params.mount, status: 'live' });
-
       res.status(200).end();
     } catch (error) {
       console.error("Mount add error:", error);
@@ -231,10 +113,6 @@ export class IcecastAuthController {
     }
   }
 
-  /**
-   * Mount Remove Event
-   * Called when a source disconnects
-   */
   async mountRemove(req: Request, res: Response): Promise<void> {
     try {
       const params = {
@@ -243,10 +121,6 @@ export class IcecastAuthController {
       };
 
       console.log("Mount removed:", params);
-
-      // YOUR LOGIC HERE
-      // await db.mounts.update({ name: params.mount }, { status: 'offline' });
-
       res.status(200).end();
     } catch (error) {
       console.error("Mount remove error:", error);
@@ -254,10 +128,6 @@ export class IcecastAuthController {
     }
   }
 
-  /**
-   * Listener Add Event
-   * Called when a listener connects
-   */
   async listenerAdd(req: Request, res: Response): Promise<void> {
     try {
       const params = {
@@ -267,10 +137,6 @@ export class IcecastAuthController {
       };
 
       console.log("Listener added:", params);
-
-      // YOUR LOGIC HERE
-      // await db.listeners.increment({ mount: params.mount });
-
       res.status(200).end();
     } catch (error) {
       console.error("Listener add error:", error);
@@ -278,10 +144,6 @@ export class IcecastAuthController {
     }
   }
 
-  /**
-   * Listener Remove Event
-   * Called when a listener disconnects
-   */
   async listenerRemove(req: Request, res: Response): Promise<void> {
     try {
       const params = {
@@ -291,10 +153,6 @@ export class IcecastAuthController {
       };
 
       console.log("Listener removed:", params);
-
-      // YOUR LOGIC HERE
-      // await db.listeners.decrement({ mount: params.mount });
-
       res.status(200).end();
     } catch (error) {
       console.error("Listener remove error:", error);
@@ -303,5 +161,4 @@ export class IcecastAuthController {
   }
 }
 
-// Export singleton instance
 export const icecastAuthController = new IcecastAuthController();
