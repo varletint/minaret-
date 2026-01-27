@@ -100,9 +100,9 @@ export class IcecastAuthController {
   async mountAdd(req: Request, res: Response): Promise<void> {
     try {
       const params = {
-        mount: req.query.mount as string,
-        server: req.query.server as string,
-        port: req.query.port as string,
+        mount: req.body.mount as string,
+        server: req.body.server as string,
+        port: req.body.port as string,
       };
 
       console.log("Mount added:", params);
@@ -116,8 +116,8 @@ export class IcecastAuthController {
   async mountRemove(req: Request, res: Response): Promise<void> {
     try {
       const params = {
-        mount: req.query.mount as string,
-        server: req.query.server as string,
+        mount: req.body.mount as string,
+        server: req.body.server as string,
       };
 
       console.log("Mount removed:", params);
@@ -131,9 +131,9 @@ export class IcecastAuthController {
   async listenerAdd(req: Request, res: Response): Promise<void> {
     try {
       const params = {
-        mount: req.query.mount as string,
-        client: req.query.client as string,
-        ip: req.query.ip as string,
+        mount: req.body.mount as string,
+        client: req.body.client as string,
+        ip: req.body.ip as string,
       };
 
       console.log("Listener added:", params);
@@ -147,9 +147,9 @@ export class IcecastAuthController {
   async listenerRemove(req: Request, res: Response): Promise<void> {
     try {
       const params = {
-        mount: req.query.mount as string,
-        client: req.query.client as string,
-        duration: req.query.duration as string,
+        mount: req.body.mount as string,
+        client: req.body.client as string,
+        duration: req.body.duration as string,
       };
 
       console.log("Listener removed:", params);
