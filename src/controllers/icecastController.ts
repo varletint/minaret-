@@ -64,60 +64,54 @@ export class IcecastAuthController {
   //     );
 
   //     if (isValid) {
-  //       // CRITICAL: Return 200 status with icecast-auth-user: 1
-  //       res.setHeader("icecast-auth-user", "1");
-  //       res.setHeader("icecast-auth-message", "Authentication successful");
+  //       // CRITICAL: Return 200 status with Icecast-auth-user: 1
+  //       res.setHeader("Icecast-auth-user", "1");
+  //       res.setHeader("Icecast-auth-message", "Authentication successful");
 
   //       // Optional: You can set custom headers for metadata
-  //       // res.setHeader('icecast-auth-timelimit', '3600'); // Limit connection time
+  //       // res.setHeader('Icecast-auth-timelimit', '3600'); // Limit connection time
 
   //       res.status(200).end();
   //     } else {
   //       // Return 403 for authentication failure
-  //       res.setHeader("icecast-auth-user", "0");
-  //       res.setHeader("icecast-auth-message", "Invalid credentials");
+  //       res.setHeader("Icecast-auth-user", "0");
+  //       res.setHeader("Icecast-auth-message", "Invalid credentials");
   //       res.status(403).end();
   //     }
   //   } catch (error) {
   //     console.error("Source auth error:", error);
-  //     res.setHeader("icecast-auth-user", "0");
-  //     res.setHeader("icecast-auth-message", "Server error");
+  //     res.setHeader("Icecast-auth-user", "0");
+  //     res.setHeader("Icecast-auth-message", "Server error");
   //     res.status(500).end();
   //   }
   // }
 
   async sourceAuth(req: Request, res: Response) {
-    const { user, pass, mount, ip } = req.body;
+    try {
+      console.log("Icecast Auth Request:", req.body);
 
-    console.log(
-      `Connection attempt from ${user} on mount ${mount} (IP: ${ip})`
-    );
+      const { action, user, pass, mount } = req.body;
 
-    // --- YOUR DYNAMIC LOGIC HERE ---
-    // Example: Check against a database or external API
-    const isUserValid = user === "sourcer" && pass === "hackme";
+      // 2. Validate the source (BUTT client)
+      // BUTT usually sends 'source' as the username by default
+      if (user === "test" && pass === "hackme") {
+        console.log(`✅ Success: Authorizing ${user} for mount ${mount}`);
 
-    if (isUserValid) {
-      console.log("Access Granted");
+        // 3. This header MUST match the 'auth_header' option in your icecast.xml
+        res.setHeader("icecast-auth-user", "1");
 
-      // Success: Tell Icecast to allow the stream.
-      // You can also define the Role/ACL here to fill those (null) fields!
-      res.set({
-        "Icecast-Auth": "1",
-        "Icecast-Role": "DJ_Premium",
-        "Icecast-ACL": "admin-access",
-      });
-      res.set("Content-Type", "text/plain");
-      return res.status(200).send("icecast-auth-user: 1");
-    } else {
-      console.log("Access Denied");
-
-      // Failure: Tell Icecast to block the connection.
-      res.set({
-        "Icecast-Auth": "0",
-        "Icecast-Auth-Message": "Invalid dynamic credentials",
-      });
-      return res.status(401).send("icecast-auth-user: 0");
+        // Use writeHead to ensure no other 'bloat' headers get in the way
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        return res.end("OK");
+      } else {
+        console.log(`❌ Denied: Invalid credentials for ${user}`);
+        res.setHeader("icecast-auth-user", "0");
+        res.writeHead(401, { "Content-Type": "text/plain" });
+        return res.end("Forbidden");
+      }
+    } catch (error) {
+      console.error("Error in sourceAuth:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }
   /**
@@ -144,20 +138,20 @@ export class IcecastAuthController {
 
       // if (isAllowed) {
 
-      res.setHeader("icecast-auth-user", "1");
-      res.setHeader("icecast-auth-message", "Access granted");
+      res.setHeader("Icecast-auth-user", "1");
+      res.setHeader("Icecast-auth-message", "Access granted");
       res.setHeader("Content-Type", "text/plain");
-      res.status(200).send("icecast-auth-user: 1");
+      res.status(200).send("Icecast-auth-user: 1");
       // } else {
-      // res.setHeader("icecast-auth-user", "0");
-      // res.setHeader("icecast-auth-message", "Access denied");
+      // res.setHeader("Icecast-auth-user", "0");
+      // res.setHeader("Icecast-auth-message", "Access denied");
       // res.status(403).send("Access denied");
       // }
     } catch (error) {
       console.error("Listener auth error:", error);
-      res.setHeader("icecast-auth-user", "0");
+      res.setHeader("Icecast-auth-user", "0");
       res.setHeader("Content-Type", "text/plain");
-      res.setHeader("icecast-auth-message", "Server error");
+      res.setHeader("Icecast-auth-message", "Server error");
       res.status(500).end();
     }
   }
