@@ -25,7 +25,7 @@ export class IcecastAuthController {
       );
 
       if (!station) {
-        console.log(`❌ Denied: No station found for mount ${mount}`);
+        console.log(`Denied: No station found for mount ${mount}`);
         res.setHeader("icecast-auth-user", "0");
         res.writeHead(404, { "Content-Type": "text/plain" });
         return res.end("Mount not found");
@@ -35,12 +35,12 @@ export class IcecastAuthController {
       const validPassword = station.icecastCredentials?.password === pass;
 
       if (validUsername && validPassword) {
-        console.log(`✅ Success: Authorizing ${user} for mount ${mount}`);
+        console.log(`Success: Authorizing ${user} for mount ${mount}`);
         res.setHeader("icecast-auth-user", "1");
         res.writeHead(200, { "Content-Type": "text/plain" });
         return res.end("OK");
       } else {
-        console.log(`❌ Denied: Invalid credentials for ${user}`);
+        console.log(`Denied: Invalid credentials for ${user}`);
         res.setHeader("icecast-auth-user", "0");
         res.writeHead(401, { "Content-Type": "text/plain" });
         return res.end("Forbidden");
