@@ -21,6 +21,7 @@ export interface IStation extends Document {
     isPublic: boolean;
   };
   stats: {
+    currentListeners: number;
     totalListeners: number;
     peakListeners: number;
     totalBroadcastMinutes: number;
@@ -95,6 +96,10 @@ const stationSchema = new Schema<IStation>(
       },
     },
     stats: {
+      currentListeners: {
+        type: Number,
+        default: 0,
+      },
       totalListeners: {
         type: Number,
         default: 0,
