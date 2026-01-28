@@ -1,37 +1,24 @@
 import { Router } from "express";
 import { icecastAuthController } from "../controllers/icecastController";
+import { asyncHandler } from "../middleware/index.js";
 
 const router = Router();
 
-/**
- * Icecast API Routes
- * Mount these at /api/v1/icecast in your main app
- */
+// /api/v1/icecast/
 
-// Authentication endpoints
-router.post("/source-auth", (req, res) =>
-  icecastAuthController.sourceAuth(req, res)
-);
+router.post("/source-auth", asyncHandler(icecastAuthController.sourceAuth));
 
-router.post("/listener-auth", (req, res) =>
-  icecastAuthController.listenerAuth(req, res)
-);
+router.post("/listener-auth", asyncHandler(icecastAuthController.listenerAuth));
 
-// Event webhooks
-router.post("/mount-add", (req, res) =>
-  icecastAuthController.mountAdd(req, res)
-);
+router.post("/mount-add", asyncHandler(icecastAuthController.mountAdd));
 
-router.post("/mount-remove", (req, res) =>
-  icecastAuthController.mountRemove(req, res)
-);
+router.post("/mount-remove", asyncHandler(icecastAuthController.mountRemove));
 
-router.post("/listener-add", (req, res) =>
-  icecastAuthController.listenerAdd(req, res)
-);
+router.post("/listener-add", asyncHandler(icecastAuthController.listenerAdd));
 
-router.post("/listener-remove", (req, res) =>
-  icecastAuthController.listenerRemove(req, res)
+router.post(
+  "/listener-remove",
+  asyncHandler(icecastAuthController.listenerRemove)
 );
 
 export default router;
