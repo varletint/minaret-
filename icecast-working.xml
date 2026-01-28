@@ -1,4 +1,85 @@
 <icecast>
+  <location>Nigeria</location>
+  <admin>admin@example.com</admin>
+
+  <!-- IMPORTANT: public hostname or domain your listeners will use -->
+  <hostname>localhost</hostname>
+
+  <limits>
+    <clients>1000</clients>
+    <sources>50</sources>
+    <queue-size>524288</queue-size>
+    <header-timeout>15</header-timeout>
+    <source-timeout>10</source-timeout>
+    <burst-size>65536</burst-size>
+  </limits>
+
+  <listen-socket>
+    <port>8000</port>
+    <!-- no bind-address => listen on all interfaces -->
+  </listen-socket>
+
+  <authentication>
+    <!-- These protect admin + any mounts that do NOT have URL auth -->
+    <admin-user>admin</admin-user>
+    <admin-password>admin</admin-password>
+
+    <!-- Fallback source password for mounts without <authentication type="url"> -->
+    <source-password>admin</source-password>
+
+    <relay-user>relay</relay-user>
+    <relay-password>admin</relay-password>
+  </authentication>
+
+  <paths>
+    <basedir>C:/IcecastLogs</basedir>
+    <logdir>C:/IcecastLogs</logdir>
+    <webroot>./web</webroot>
+    <adminroot>./admin</adminroot>
+    <alias source="/" destination="/status.xsl"/>
+  </paths>
+
+  <logging>
+    <accesslog>access.log</accesslog>
+    <errorlog>error.log</errorlog>
+    <loglevel>3</loglevel>
+  </logging>
+
+  <http-headers>
+    <!-- helpful for browsers + players -->
+    <header name="Access-Control-Allow-Origin" value="*" />
+  </http-headers>
+
+  <!-- DEFAULT mount settings apply to ALL mounts that don't have an explicit <mount type="normal"> -->
+  <mount type="default">
+    <authentication type="url">
+      <!-- (Optional) lifecycle hooks -->
+      <option name="mount_add" value="http://127.0.0.1:3000/icecast/mount_add" />
+      <option name="mount_remove" value="http://127.0.0.1:3000/icecast/mount_remove" />
+
+      <!-- SOURCE AUTH webhook (this is the important one) -->
+      <option name="stream_auth" value="http://127.0.0.1:3000/icecast/stream_auth" />
+
+      <!-- Icecast will allow ONLY if your webhook returns this header -->
+      <option name="auth_header" value="icecast-auth-user: 1" />
+
+      <!-- Optional: allow server to enforce a time limit (seconds) if you return it -->
+      <option name="timelimit_header" value="icecast-auth-timelimit:" />
+    </authentication>
+
+    <!-- do NOT put listener_add / listener_remove here => listeners remain OPEN -->
+  </mount>
+
+  <!-- Example explicit mount (optional) -->
+  <mount type="normal">
+    <mount-name>/radio.ogg</mount-name>
+    <public>1</public>
+  </mount>
+</icecast>
+
+
+
+<icecast>
     <location>Earth</location>
     <admin>icemaster@localhost</admin>
     <hostname>localhost</hostname>
