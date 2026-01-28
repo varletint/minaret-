@@ -11,12 +11,12 @@ export async function connectDB(): Promise<void> {
   }
 }
 
-mongoose.connection.on("disconnected", () => {
-  console.warn("MongoDB disconnected");
-});
+// mongoose.connection.on("disconnected", () => {
+//   console.warn("MongoDB disconnected");
+// });
 
-mongoose.connection.on("error", (err: Error) => {
-  console.error("MongoDB error:", err);
-});
+// mongoose.connection.on("error", (err: Error) => {
+//   console.error("MongoDB error:", err);
+// });
 
 export default mongoose;
