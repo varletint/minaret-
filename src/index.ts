@@ -16,7 +16,7 @@ import {
 
 const app = express();
 
-// app.use(helmet());
+app.use(helmet());
 const allowedOrigins = [
   "http://10.209.0.108:5173",
   "http://localhost:5173",
