@@ -16,7 +16,7 @@ import {
 
 const app = express();
 
-app.use(helmet());
+// app.use(helmet());
 const allowedOrigins = [
   "http://10.209.0.108:5173",
   "http://localhost:5173",
@@ -39,7 +39,7 @@ app.use(
 );
 app.use(morgan(env.nodeEnv === "development" ? "dev" : "combined"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.get("/api/v1/health", (_req: Request, res: Response) => {
