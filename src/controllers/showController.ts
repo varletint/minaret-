@@ -140,7 +140,7 @@ export async function updateShow(req: Request, res: Response): Promise<void> {
   if (updates.recurrence) {
     show.recurrence = {
       pattern: updates.recurrence.pattern || show.recurrence?.pattern,
-      daysOfWeek: updates.recurrence || [],
+      daysOfWeek: updates.recurrence.daysOfWeek || [],
       dayOfMonth: updates.recurrence.dayOfMonth,
     };
   }
