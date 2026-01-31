@@ -11,7 +11,7 @@ import * as showController from "../controllers/showController.js";
 
 const router = Router();
 
-// POST /api/v1/stations - Create station
+// POST /api/v1/stations
 router.post(
   "/",
   authenticate,
@@ -19,19 +19,19 @@ router.post(
   asyncHandler(stationController.createStation)
 );
 
-// GET /api/v1/stations - List public stations
+// GET /api/v1/stations
 router.get("/", asyncHandler(stationController.listStations));
 
-// GET /api/v1/stations/live - List only live stations
+// GET /api/v1/stations/live
 router.get("/live", asyncHandler(stationController.listLiveStations));
 
-// GET /api/v1/stations/me - Get my station
+// GET /api/v1/stations/me
 router.get("/me", authenticate, asyncHandler(stationController.getMyStation));
 
 // GET /api/v1/stations/:slug - Get by slug
 router.get("/:slug", asyncHandler(stationController.getStationBySlug));
 
-// PATCH /api/v1/stations/me - Update my station
+// PATCH /api/v1/stations/me
 router.patch(
   "/me",
   authenticate,

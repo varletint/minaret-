@@ -8,16 +8,16 @@ const router = Router();
 
 router.post("/source-auth", asyncHandler(icecastAuthController.sourceAuth));
 
-router.post("/listener-auth", asyncHandler(icecastAuthController.listenerAuth));
+// router.post("/listener-auth", asyncHandler(icecastAuthController.listenerAuth));
 
-router.post("/mount-add", asyncHandler(icecastAuthController.mountAdd));
+router.post("/mount_add", asyncHandler(icecastAuthController.mountAdd));
 
-router.post("/mount-remove", asyncHandler(icecastAuthController.mountRemove));
+router.post("/mount_remove", asyncHandler(icecastAuthController.mountRemove));
 
 router.post("/listener-add", asyncHandler(icecastAuthController.listenerAdd));
 
 router.post(
-  "/listener-remove",
+  "/listener_remove",
   asyncHandler(icecastAuthController.listenerRemove)
 );
 

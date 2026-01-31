@@ -1,3 +1,6 @@
+scp -r C:\Users\hp\Projects\backends\js\minaret-backend root@63.250.59.135/opt/icecast-auth
+
+
 import { Router } from "express";
 import { asyncHandler } from "../middleware/index.js";
 import * as icecastController from "../controllers/icecastController.js";

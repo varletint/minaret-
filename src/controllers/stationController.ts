@@ -82,7 +82,9 @@ export async function listLiveStations(
 export async function getMyStation(req: Request, res: Response): Promise<void> {
   const mosqueId = req.mosqueId!;
 
-  const station = await Station.findOne({ mosqueId });
+  const station = await Station.findOne({ mosqueId }).select(
+    "+icecastCredentials.password"
+  );
   if (!station) {
     throw NotFoundError("You do not have a station yet");
   }
