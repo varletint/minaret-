@@ -191,7 +191,7 @@ export async function goLive(req: Request, res: Response): Promise<void> {
 
   // Build stream configuration
   const { env } = await import("../config/env.js");
-  const icecastHost = env.icecast.host;
+  const icecastHost = "https://stream.saaminaret.shop";
   const icecastPort = env.icecast.port;
   const listenUrl = `http://${icecastHost}:${icecastPort}${station.mountPoint}`;
 
