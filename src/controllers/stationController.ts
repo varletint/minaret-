@@ -129,7 +129,6 @@ export async function updateMyStation(
     throw NotFoundError("You do not have a station yet");
   }
 
-  // Apply updates
   if (updates.name) station.name = updates.name;
   if (updates.description !== undefined)
     station.description = updates.description;
@@ -189,7 +188,6 @@ export async function goLive(req: Request, res: Response): Promise<void> {
     throw NotFoundError("You do not have a station yet");
   }
 
-  // Build stream configuration
   const { env } = await import("../config/env.js");
   const icecastHost = "https://stream.saaminaret.shop";
   const icecastPort = env.icecast.port;
