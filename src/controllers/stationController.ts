@@ -195,7 +195,6 @@ export async function goLive(req: Request, res: Response): Promise<void> {
   const icecastPort = env.icecast.port;
   const listenUrl = `http://${icecastHost}:${icecastPort}${station.mountPoint}`;
 
-  // Generate credentials and save streamUrl if not already set
   if (!station.icecastCredentials?.password) {
     const crypto = await import("crypto");
     station.icecastCredentials = {
@@ -204,7 +203,6 @@ export async function goLive(req: Request, res: Response): Promise<void> {
     };
   }
 
-  // Always ensure streamUrl is saved
   if (station.streamUrl !== listenUrl) {
     station.streamUrl = listenUrl;
   }
@@ -217,7 +215,6 @@ export async function goLive(req: Request, res: Response): Promise<void> {
     status: "success",
     message: "Ready to broadcast. Connect with the credentials below.",
     data: {
-      // For broadcaster software (OBS, BUTT, etc.)
       streamConfig: {
         server: icecastHost,
         port: icecastPort,
@@ -227,9 +224,7 @@ export async function goLive(req: Request, res: Response): Promise<void> {
         format: station.settings.format,
         bitrate: station.settings.bitrate,
       },
-      // URL for listeners (frontend audio player)
       listenUrl: station.streamUrl,
-      // Current status (will become true when Icecast webhook fires)
       isLive: station.isLive,
     },
   });
