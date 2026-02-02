@@ -26,7 +26,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -58,7 +57,6 @@ app.use("/api/v1/shows", showRoutes);
 app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1/icecast", icecastRoutes);
 
-// 404 handler
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
     status: "error",
@@ -68,7 +66,6 @@ app.use((_req: Request, res: Response) => {
 
 app.use(errorHandler);
 
-// Start server with database connection
 async function startServer() {
   await connectDB();
 
