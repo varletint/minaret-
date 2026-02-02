@@ -4,7 +4,6 @@ import { env } from "../config/env.js";
 import { Mosque, IMosque } from "../models/Mosque.js";
 import { UnauthorizedError } from "./errorHandler.js";
 
-// Extend Express Request to include mosque
 declare global {
   namespace Express {
     interface Request {
