@@ -69,7 +69,6 @@ mosqueSchema.pre("save", async function () {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare password method
 mosqueSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
