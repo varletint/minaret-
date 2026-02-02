@@ -9,13 +9,11 @@ export async function createShow(req: Request, res: Response): Promise<void> {
   const mosqueId = req.mosqueId!;
   const input = req.body as CreateShowInput;
 
-  // Get mosque's station
   const station = await Station.findOne({ mosqueId });
   if (!station) {
     throw NotFoundError("You must create a station first");
   }
 
-  // Create show
   const show = await Show.create({
     stationId: station._id,
     mosqueId,
@@ -75,7 +73,6 @@ export async function getShowsByStation(
     .populate("stationId", "name slug")
     .sort({ scheduledStart: 1 });
 
-  // Use "success" instead of "status" to match requested format
   res.json({
     success: true,
     data: { shows },
