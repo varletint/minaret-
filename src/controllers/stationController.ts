@@ -15,13 +15,11 @@ export async function createStation(
   const mosqueId = req.mosqueId!;
   const { name, description, settings } = req.body as CreateStationInput;
 
-  // Check if mosque already has a station
   const existingStation = await Station.findOne({ mosqueId });
   if (existingStation) {
     throw ConflictError("You already have a station. Update it instead.");
   }
 
-  // Create station
   const station = await Station.create({
     mosqueId,
     name,
