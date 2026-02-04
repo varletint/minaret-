@@ -39,7 +39,7 @@ export async function register(req: Request, res: Response): Promise<void> {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: env.nodeEnv === "production",
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: parseExpirationToMs(env.refreshTokenExpiresIn),
     path: "/",
   });
@@ -82,7 +82,7 @@ export async function login(req: Request, res: Response): Promise<void> {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: env.nodeEnv === "production",
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: parseExpirationToMs(env.refreshTokenExpiresIn),
     path: "/",
   });
@@ -134,7 +134,7 @@ export async function logout(_req: Request, res: Response): Promise<void> {
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: env.nodeEnv === "production",
-    sameSite: "lax",
+    sameSite: "none",
     path: "/",
   });
 
