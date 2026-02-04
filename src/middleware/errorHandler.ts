@@ -47,10 +47,10 @@ export function errorHandler(
     message = "Duplicate entry exists";
   } else {
     message =
-      env.nodeEnv === "development" ? err.message : "Internal server error";
+      env.NODE_ENV === "development" ? err.message : "Internal server error";
   }
 
-  if (env.nodeEnv === "development") {
+  if (env.NODE_ENV === "development") {
     stack = err.stack;
   }
 
