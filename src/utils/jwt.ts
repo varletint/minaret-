@@ -23,7 +23,7 @@ export function verifyRefreshToken(token: string): TokenPayload {
 
 export function parseExpirationToMs(exp: string): number {
   const match = exp.match(/^(\d+)([smhd])$/);
-  if (!match) return 7 * 24 * 60 * 60 * 1000; // Default 7 days
+  if (!match) return 7 * 24 * 60 * 60 * 1000;
 
   const value = parseInt(match[1], 10);
   const unit = match[2];
