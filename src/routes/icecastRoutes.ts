@@ -6,10 +6,8 @@ const router = Router();
 
 // /api/v1/icecast/
 
+// router.post("/listener-auth", asyncHandler(icecastAuthController.listenerAuth));s
 router.post("/source-auth", asyncHandler(icecastAuthController.sourceAuth));
-
-// router.post("/listener-auth", asyncHandler(icecastAuthController.listenerAuth));
-
 router.post("/mount_add", asyncHandler(icecastAuthController.mountAdd));
 
 router.post("/mount_remove", asyncHandler(icecastAuthController.mountRemove));
