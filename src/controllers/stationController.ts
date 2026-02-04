@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { Station } from "../models/Station.js";
 import { NotFoundError, ConflictError } from "../middleware/index.js";
 import {
@@ -187,7 +187,8 @@ export async function goLive(req: Request, res: Response): Promise<void> {
   }
 
   const { env } = await import("../config/env.js");
-  const icecastHost = "https://stream.saaminaret.shop";
+  const icecastHost =
+    env.NODE_ENV === "production" ? env.icecast.host : "localhost";
   const icecastPort = env.icecast.port;
   const listenUrl = `http://${icecastHost}:${icecastPort}${station.mountPoint}`;
 
