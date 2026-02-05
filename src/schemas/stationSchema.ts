@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Create station validation
 export const createStationSchema = z.object({
   name: z
     .string()
@@ -23,7 +22,6 @@ export const createStationSchema = z.object({
     .optional(),
 });
 
-// Update station validation
 export const updateStationSchema = z.object({
   name: z
     .string()
@@ -47,14 +45,12 @@ export const updateStationSchema = z.object({
     .optional(),
 });
 
-// Update now playing
 export const updateNowPlayingSchema = z.object({
   title: z.string().max(200).optional(),
   artist: z.string().max(200).optional(),
   album: z.string().max(200).optional(),
 });
 
-// Type exports
 export type CreateStationInput = z.infer<typeof createStationSchema>;
 export type UpdateStationInput = z.infer<typeof updateStationSchema>;
 export type UpdateNowPlayingInput = z.infer<typeof updateNowPlayingSchema>;
