@@ -67,6 +67,5 @@ export const updateShowSchema = z.object({
   tags: z.array(z.string().max(50)).max(10).optional(),
 });
 
-// Type exports
 export type CreateShowInput = z.infer<typeof createShowSchema>;
 export type UpdateShowInput = z.infer<typeof updateShowSchema>;
