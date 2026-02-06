@@ -12,6 +12,7 @@ import {
   showRoutes,
   searchRoutes,
   icecastRoutes,
+  analyticsRoutes,
 } from "./routes/index.js";
 
 const app = express();
@@ -56,6 +57,7 @@ app.use("/api/v1/stations", stationRoutes);
 app.use("/api/v1/shows", showRoutes);
 app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1/icecast", icecastRoutes);
+app.use("/api/v1/analytics", analyticsRoutes);
 
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
