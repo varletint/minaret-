@@ -46,11 +46,7 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@types/geoip-lite": "^1.4.4",
-    "@types/ua-parser-js": "^0.7.39",
-    "@typescript-eslint/eslint-plugin": "^8.54.0",
-    "@typescript-eslint/parser": "^8.54.0",
-    "eslint": "^10.0.0"
+    "@types/ua-parser-js": "^0.7.39"
   }
 }
