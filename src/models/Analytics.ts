@@ -19,6 +19,13 @@ export interface IAnalyticsEvent extends Document {
     deviceModel?: string;
   };
   ipAddress?: string;
+  location?: {
+    country?: string;
+    region?: string;
+    city?: string;
+    timezone?: string;
+    coordinates?: [number, number];
+  };
   createdAt: Date;
 }
 
@@ -57,6 +64,16 @@ const analyticsEventSchema = new Schema<IAnalyticsEvent>(
     },
     ipAddress: {
       type: String,
+    },
+    location: {
+      country: String,
+      region: String,
+      city: String,
+      timezone: String,
+      coordinates: {
+        type: [Number],
+        index: "2dsphere",
+      },
     },
   },
   {

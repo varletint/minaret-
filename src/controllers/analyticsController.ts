@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import crypto from "crypto";
 import { UAParser } from "ua-parser-js";
+import geoip from "geoip-lite";
 import { AnalyticsEvent, EventType } from "../models/Analytics.js";
 import { TrackEventInput } from "../schemas/analyticsSchema.js";
 
@@ -30,6 +31,8 @@ export async function trackEvent(req: Request, res: Response): Promise<void> {
   const os = parser.getOS();
   const deviceInfo = parser.getDevice();
 
+  const geo = ipAddress ? geoip.lookup(ipAddress) : null;
+
   await AnalyticsEvent.create({
     eventType: type as EventType,
     userId: userId || undefined,
@@ -46,6 +49,15 @@ export async function trackEvent(req: Request, res: Response): Promise<void> {
       deviceModel: deviceInfo.model,
     },
     ipAddress,
+    location: geo
+      ? {
+          country: geo.country,
+          region: geo.region,
+          city: geo.city,
+          timezone: geo.timezone,
+          coordinates: geo.ll,
+        }
+      : undefined,
   });
 
   res.status(201).json({
