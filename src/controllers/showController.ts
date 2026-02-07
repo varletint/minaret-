@@ -62,14 +62,19 @@ export async function listShows(req: Request, res: Response): Promise<void> {
   });
 }
 
-// GET /api/v1/stations/:stationId/shows - Get shows by station ID
+// GET /api/v1/stations/:stationSlug/shows - Get shows by station slug
 export async function getShowsByStation(
   req: Request,
   res: Response
 ): Promise<void> {
-  const { stationId } = req.params;
+  const { stationSlug } = req.params;
 
-  const shows = await Show.find({ stationId })
+  const station = await Station.findOne({ slug: stationSlug });
+  if (!station) {
+    throw NotFoundError("Station not found");
+  }
+
+  const shows = await Show.find({ stationId: station._id })
     .populate("stationId", "name slug")
     .sort({ scheduledStart: 1 });
 

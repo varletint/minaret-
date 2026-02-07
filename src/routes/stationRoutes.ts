@@ -64,7 +64,10 @@ router.post(
 // GET /api/v1/stations/:slug/now-playing - Get now playing (public)
 router.get("/:slug/now-playing", asyncHandler(stationController.getNowPlaying));
 
-// GET /api/v1/stations/:stationId/shows - Get shows by station ID
-router.get("/:stationId/shows", asyncHandler(showController.getShowsByStation));
+// GET /api/v1/stations/:stationSlug/shows - Get shows by station slug
+router.get(
+  "/:stationSlug/shows",
+  asyncHandler(showController.getShowsByStation)
+);
 
 export default router;
