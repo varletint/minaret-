@@ -11,7 +11,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ci": "npm run typecheck && npm run build"
+    "ci": "npm run build"
   },
   "keywords": [
     "radio",

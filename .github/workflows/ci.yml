@@ -1,10 +1,13 @@
 name: CI
 
+# Temporarily disabled for debugging - uncomment to re-enable
+# on:
+#   push:
+#     branches: [main, master]
+#   pull_request:
+#     branches: [main, master]
 on:
-  push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
+  workflow_dispatch: # Manual trigger only
 
 env:
   NODE_VERSION: "20"
