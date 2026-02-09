@@ -19,6 +19,10 @@ export interface IShow extends Document {
   actualStart?: Date;
   actualEnd?: Date;
   tags: string[];
+  recording?: {
+    isEnabled: boolean;
+    recordingId?: mongoose.Types.ObjectId;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -84,6 +88,16 @@ const showSchema = new Schema<IShow>(
         trim: true,
       },
     ],
+    recording: {
+      isEnabled: {
+        type: Boolean,
+        default: true,
+      },
+      recordingId: {
+        type: Schema.Types.ObjectId,
+        ref: "Recording",
+      },
+    },
   },
   {
     timestamps: true,
