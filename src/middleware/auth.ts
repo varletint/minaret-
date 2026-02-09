@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 import { Mosque, IMosque } from "../models/Mosque.js";
+import { IAdmin } from "../models/Admin.js";
 import { UnauthorizedError } from "./errorHandler.js";
 
 declare global {
@@ -9,6 +10,8 @@ declare global {
     interface Request {
       mosque?: IMosque;
       mosqueId?: string;
+      admin?: IAdmin;
+      adminId?: string;
     }
   }
 }
