@@ -75,21 +75,135 @@ export class IcecastAuthController {
   }
 
   async mountAdd(req: Request, res: Response): Promise<void> {
-    const params = {
-      mount: req.body.mount as string,
-      server: req.body.server as string,
-      port: req.body.port as string,
-    };
+    const { mount } = req.body;
+    console.log(`[Icecast] Mount added: ${mount}`);
+
+    try {
+      const station = await Station.findOne({ mountPoint: mount });
+      if (!station) {
+        console.log(`[Icecast] Station not found for mount: ${mount}`);
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("OK");
+        return;
+      }
+
+      // 1. Find upcoming show (within next 30 mins) or use generic title
+      const now = new Date();
+      const thirtyMinsFromNow = new Date(now.getTime() + 30 * 60000);
+
+      let show = await import("../models/Show.js").then(({ Show }) =>
+        Show.findOne({
+          stationId: station._id,
+          scheduledStart: { $gte: now, $lte: thirtyMinsFromNow },
+          isLive: false,
+        }).sort({ scheduledStart: 1 })
+      );
+
+      // If no scheduled show, create an ad-hoc one?
+      // For now, let's create a "Live Stream" show if none exists
+      if (!show) {
+        const { Show } = await import("../models/Show.js");
+        show = await Show.create({
+          stationId: station._id,
+          mosqueId: station.mosqueId,
+          title: "Live Stream",
+          description: "Auto-started live stream",
+          scheduledStart: now,
+          scheduledEnd: new Date(now.getTime() + 60 * 60000), // Default 1 hour
+          isLive: true,
+          actualStart: now,
+        });
+      } else {
+        show.isLive = true;
+        show.actualStart = now;
+      }
+
+      // 2. Start Recording
+      const { triggerRecordingStart } = await import(
+        "../services/recordingService.js"
+      );
+      try {
+        const recordingId = await triggerRecordingStart({
+          show: show as any,
+          station: station as any,
+        });
+
+        show.recording = {
+          isEnabled: true,
+          recordingId: new (await import("mongoose")).Types.ObjectId(
+            recordingId
+          ),
+        };
+      } catch (err) {
+        console.error(
+          `[Icecast] Failed to auto-start recording for ${mount}:`,
+          err
+        );
+      }
+
+      await show.save();
+
+      // 3. Update Station status
+      station.isLive = true;
+      // station.status = "active";
+      station.currentTrack = {
+        title: show.title,
+        artist: show.hostName || "Live",
+        startedAt: now,
+      };
+      await station.save();
+
+      console.log(`[Icecast] Auto-started show "${show.title}" for ${mount}`);
+    } catch (error) {
+      console.error(`[Icecast] Error in mountAdd:`, error);
+    }
 
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.end("OK");
   }
 
   async mountRemove(req: Request, res: Response): Promise<void> {
-    const params = {
-      mount: req.body.mount as string,
-      server: req.body.server as string,
-    };
+    const { mount } = req.body;
+    console.log(`[Icecast] Mount removed: ${mount}`);
+
+    try {
+      const station = await Station.findOne({ mountPoint: mount });
+      if (!station) {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("OK");
+        return;
+      }
+
+      // 1. Update Station
+      station.isLive = false;
+      station.currentTrack = undefined;
+      await station.save();
+
+      // 2. Find active show and stop it
+      const { Show } = await import("../models/Show.js");
+      const show = await Show.findOne({
+        stationId: station._id,
+        isLive: true,
+      }).sort({ actualStart: -1 });
+
+      if (show) {
+        show.isLive = false;
+        show.actualEnd = new Date();
+
+        // 3. Stop Recording
+        if (show.recording?.recordingId) {
+          const { triggerRecordingStop } = await import(
+            "../services/recordingService.js"
+          );
+          await triggerRecordingStop(show.recording.recordingId.toString());
+        }
+
+        await show.save();
+        console.log(`[Icecast] Auto-stopped show "${show.title}" for ${mount}`);
+      }
+    } catch (error) {
+      console.error(`[Icecast] Error in mountRemove:`, error);
+    }
 
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.end("OK");
