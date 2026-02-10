@@ -12,11 +12,19 @@ echo "  Minaret Recorder - VPS Setup"
 echo "========================================="
 
 # Update system
-echo "[1/5] Updating system packages..."
+echo "[1/6] Updating system packages..."
 sudo apt update && sudo apt upgrade -y
 
+# Install Git
+echo "[2/6] Installing Git..."
+if ! command -v git &> /dev/null; then
+  sudo apt install -y git
+else
+  echo "  Git already installed: $(git --version)"
+fi
+
 # Install Node.js 20 via NodeSource
-echo "[2/5] Installing Node.js 20..."
+echo "[3/6] Installing Node.js 20..."
 if ! command -v node &> /dev/null; then
   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
   sudo apt install -y nodejs
@@ -25,7 +33,7 @@ else
 fi
 
 # Install FFmpeg
-echo "[3/5] Installing FFmpeg..."
+echo "[4/6] Installing FFmpeg..."
 if ! command -v ffmpeg &> /dev/null; then
   sudo apt install -y ffmpeg
 else
@@ -33,7 +41,7 @@ else
 fi
 
 # Install PM2
-echo "[4/5] Installing PM2..."
+echo "[5/6] Installing PM2..."
 if ! command -v pm2 &> /dev/null; then
   sudo npm install -g pm2
   pm2 startup systemd -u $USER --hp $HOME
@@ -42,7 +50,7 @@ else
 fi
 
 # Setup firewall (allow SSH + recorder port)
-echo "[5/5] Configuring firewall..."
+echo "[6/6] Configuring firewall..."
 sudo ufw allow OpenSSH
 sudo ufw allow 3001/tcp
 echo "y" | sudo ufw enable 2>/dev/null || true
