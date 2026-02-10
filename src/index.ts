@@ -13,7 +13,7 @@ import {
   searchRoutes,
   icecastRoutes,
   analyticsRoutes,
-  adminRoutes,
+  // adminRoutes,
   recordingRoutes,
 } from "./routes/index.js";
 
@@ -60,7 +60,7 @@ app.use("/api/v1/shows", showRoutes);
 app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1/icecast", icecastRoutes);
 app.use("/api/v1/analytics", analyticsRoutes);
-app.use("/api/v1/admin", adminRoutes);
+// app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/recordings", recordingRoutes);
 
 app.use((_req: Request, res: Response) => {
