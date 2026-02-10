@@ -10,7 +10,6 @@ const router = Router();
 router.get("/schedule/today", asyncHandler(showController.getTodaySchedule));
 
 // GET /api/v1/shows/my - My shows (must be before /:id)
-// 6970d3bfb6aaa807711eb371
 router.get("/my", authenticate, asyncHandler(showController.getMyShows));
 
 // POST /api/v1/shows - Create show
