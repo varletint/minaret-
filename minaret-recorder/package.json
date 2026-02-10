@@ -1,0 +1,23 @@
+{
+  "name": "minaret-recorder",
+  "version": "1.0.0",
+  "description": "VPS recording service for Minaret - records Icecast streams and uploads to Cloudflare R2",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "@aws-sdk/client-s3": "^3.0.0",
+    "dotenv": "^17.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.0"
+  }
+}
