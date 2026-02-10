@@ -7,7 +7,7 @@ export const recordingCallbackSchema = z.object({
     .object({
       index: z.number(),
       filename: z.string(),
-      firebasePath: z.string(),
+      storagePath: z.string(),
       publicUrl: z.string(),
       codec: z.enum(["mp3", "aac"]),
       durationSecs: z.number().optional(),

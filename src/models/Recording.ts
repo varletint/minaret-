@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IRecordingChunk {
   index: number;
   filename: string;
-  firebasePath: string;
+  storagePath: string;
   publicUrl: string;
   codec: "mp3" | "aac";
   durationSecs?: number;
@@ -31,7 +31,7 @@ const recordingChunkSchema = new Schema<IRecordingChunk>(
   {
     index: { type: Number, required: true },
     filename: { type: String, required: true },
-    firebasePath: { type: String, required: true },
+    storagePath: { type: String, required: true },
     publicUrl: { type: String, required: true },
     codec: { type: String, enum: ["mp3", "aac"], required: true },
     durationSecs: Number,

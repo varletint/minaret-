@@ -3,6 +3,10 @@ import { Show } from "../models/Show.js";
 import { Station } from "../models/Station.js";
 import { NotFoundError, ForbiddenError } from "../middleware/index.js";
 import { CreateShowInput, UpdateShowInput } from "../schemas/showSchema.js";
+import {
+  triggerRecordingStart,
+  triggerRecordingStop,
+} from "../services/recordingService.js";
 
 // POST /api/v1/shows - Create a new show
 export async function createShow(req: Request, res: Response): Promise<void> {
@@ -195,6 +199,24 @@ export async function startShow(req: Request, res: Response): Promise<void> {
 
   show.isLive = true;
   show.actualStart = new Date();
+
+  const station = await Station.findById(show.stationId);
+  if (!station) {
+    throw NotFoundError("Station not found");
+  }
+
+  if (show.recording?.isEnabled !== false) {
+    try {
+      const recordingId = await triggerRecordingStart({ show, station });
+      show.recording = {
+        isEnabled: true,
+        recordingId: new (await import("mongoose")).Types.ObjectId(recordingId),
+      };
+    } catch (error) {
+      console.error("Failed to start recording:", error);
+    }
+  }
+
   await show.save();
 
   await Station.findByIdAndUpdate(show.stationId, {
@@ -229,6 +251,16 @@ export async function endShow(req: Request, res: Response): Promise<void> {
 
   show.isLive = false;
   show.actualEnd = new Date();
+
+  // Stop recording if active
+  if (show.recording?.recordingId) {
+    try {
+      await triggerRecordingStop(show.recording.recordingId.toString());
+    } catch (error) {
+      console.error("Failed to stop recording:", error);
+    }
+  }
+
   await show.save();
 
   await Station.findByIdAndUpdate(show.stationId, {
