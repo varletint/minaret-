@@ -21,9 +21,7 @@ export async function triggerRecordingStart({
     startedAt: new Date(),
   });
 
-  const streamUrl =
-    station.streamUrl ||
-    `http://${env.icecast.host}:${env.icecast.port}${station.mountPoint}`;
+  const streamUrl = `http://localhost:${env.icecast.port}${station.mountPoint}`;
 
   try {
     const response = await fetch(`${env.recording.serviceUrl}/start`, {
