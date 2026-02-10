@@ -74,7 +74,11 @@ async function processChunk(
   tsPath: string,
   chunkIndex: number
 ): Promise<void> {
+  console.log(
+    `[${session.recordingId}] Processing chunk ${chunkIndex}: ${tsPath}`
+  );
   const codec = await detectCodec(tsPath);
+  console.log(`[${session.recordingId}] Detected codec: ${codec}`);
   const ext = codec === "aac" ? "m4a" : "mp3";
   const contentType = codec === "aac" ? "audio/mp4" : "audio/mpeg";
 
@@ -97,7 +101,9 @@ async function processChunk(
 
   // Upload to R2
   const storagePath = `recordings/public/${session.mosqueId}/${session.recordingId}/${outFilename}`;
+  console.log(`[${session.recordingId}] Uploading to R2: ${storagePath}`);
   const publicUrl = await uploadToStorage(outPath, storagePath, contentType);
+  console.log(`[${session.recordingId}] Upload complete: ${publicUrl}`);
 
   // Get file size
   const stats = fs.statSync(outPath);
@@ -149,6 +155,10 @@ export async function startRecording(
 
   activeSessions.set(recordingId, session);
 
+  console.log(`[${recordingId}] Starting recording...`);
+  console.log(`[${recordingId}] Stream URL: ${streamUrl}`);
+  console.log(`[${recordingId}] Session dir: ${sessionDir}`);
+
   const tsPattern = path.join(sessionDir, "chunk_%04d.ts");
 
   const ffmpegArgs = [
@@ -181,9 +191,11 @@ export async function startRecording(
   });
 
   session.ffmpegProcess = ffmpeg;
+  console.log(`[${recordingId}] FFmpeg spawned with PID: ${ffmpeg.pid}`);
 
   ffmpeg.stderr.on("data", (data) => {
-    const msg = data.toString();
+    const msg = data.toString().trim();
+    console.log(`[${recordingId}] FFmpeg: ${msg}`);
     // Detect when a new segment is opened
     if (msg.includes("Opening") && msg.includes(".ts")) {
       // Process previous chunk if exists
@@ -201,10 +213,14 @@ export async function startRecording(
   });
 
   ffmpeg.on("close", async (code) => {
-    console.log(`FFmpeg exited for ${recordingId} with code ${code}`);
+    console.log(`[${recordingId}] FFmpeg exited with code ${code}`);
 
     // Process any remaining chunks
     const files = fs.readdirSync(sessionDir).filter((f) => f.endsWith(".ts"));
+    console.log(
+      `[${recordingId}] Remaining .ts files to process: ${files.length}`,
+      files
+    );
     for (const file of files) {
       const idx = parseInt(file.match(/chunk_(\d+)\.ts/)?.[1] || "0", 10);
       await processChunk(session, path.join(sessionDir, file), idx);
@@ -233,7 +249,7 @@ export async function startRecording(
   });
 
   ffmpeg.on("error", async (error) => {
-    console.error(`FFmpeg error for ${recordingId}:`, error);
+    console.error(`[${recordingId}] FFmpeg spawn error:`, error.message);
     await sendCallback(callbackUrl, {
       recordingId,
       status: "failed",
