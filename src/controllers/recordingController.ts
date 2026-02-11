@@ -6,7 +6,7 @@ import {
   RecordingCallbackInput,
   listPublicRecordingsQuerySchema,
 } from "../schemas/recordingSchema.js";
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 
 // GET /api/v1/recordings - List recordings for a mosque
 export async function listRecordings(
@@ -166,31 +166,89 @@ export async function listPublicRecordings(
 
   const { limit, skip, stationId, mosqueId } = validationResult.data;
 
-  const query: any = { status: "ready" };
+  const pipeline: any[] = [
+    {
+      $match: {
+        status: "ready",
+        ...(stationId
+          ? { stationId: new mongoose.Types.ObjectId(stationId) }
+          : {}),
+        ...(mosqueId
+          ? { mosqueId: new mongoose.Types.ObjectId(mosqueId) }
+          : {}),
+      },
+    },
+    {
+      $lookup: {
+        from: "shows",
+        localField: "showId",
+        foreignField: "_id",
+        as: "show",
+      },
+    },
+    { $unwind: "$show" },
+    { $match: { "show.title": { $ne: "Live Stream" } } },
 
-  if (stationId) {
-    query.stationId = stationId;
-  }
-  if (mosqueId) {
-    query.mosqueId = mosqueId;
-  }
+    // Sort and Paginate
+    {
+      $facet: {
+        metadata: [{ $count: "total" }],
+        data: [
+          { $sort: { createdAt: -1 } },
+          { $skip: skip || 0 },
+          { $limit: limit || 20 },
 
-  const [recordings, total] = await Promise.all([
-    Recording.find(query)
-      .populate("showId", "title hostName scheduledStart")
-      .populate("stationId", "name slug")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec(),
-    Recording.countDocuments(query).exec(),
-  ]);
+          // Populate Station
+          {
+            $lookup: {
+              from: "stations",
+              localField: "stationId",
+              foreignField: "_id",
+              as: "station",
+            },
+          },
+          { $unwind: { path: "$station", preserveNullAndEmptyArrays: true } },
+
+          // Reshape to restore populated fields structure
+          {
+            $project: {
+              _id: 1,
+              status: 1,
+              visibility: 1,
+              chunks: 1,
+              createdAt: 1,
+              totalDurationSecs: 1,
+              // Restore populated showId
+              showId: {
+                _id: "$show._id",
+                title: "$show.title",
+                hostName: "$show.hostName",
+                scheduledStart: "$show.scheduledStart",
+              },
+              // Restore populated stationId
+              stationId: {
+                _id: "$station._id",
+                name: "$station.name",
+                slug: "$station.slug",
+              },
+              mosqueId: 1,
+            },
+          },
+        ],
+      },
+    },
+  ];
+
+  const result = await Recording.aggregate(pipeline);
+
+  const data = result[0].data;
+  const total = result[0].metadata[0]?.total || 0;
 
   res.json({
     status: "success",
-    results: recordings.length,
+    results: data.length,
     total,
-    data: { recordings },
+    data: { recordings: data },
   });
 }
 
