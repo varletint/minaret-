@@ -190,7 +190,10 @@ export async function goLive(req: Request, res: Response): Promise<void> {
   const icecastHost =
     env.NODE_ENV === "production" ? env.icecast.host : "localhost";
   const icecastPort = env.icecast.port;
-  const listenUrl = `${icecastHost}:${icecastPort}${station.mountPoint}`;
+  const proxyHost = env.icecast.proxyHost;
+  const listenUrl =
+    `${proxyHost}${station.mountPoint}` ||
+    `${icecastHost}:${icecastPort}${station.mountPoint}`;
 
   if (!station.icecastCredentials?.password) {
     const crypto = await import("crypto");

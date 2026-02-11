@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import { Recording } from "../models/Recording.js";
 import { Show } from "../models/Show.js";
 import { NotFoundError, ForbiddenError } from "../middleware/index.js";
-import { RecordingCallbackInput } from "../schemas/recordingSchema.js";
+import {
+  RecordingCallbackInput,
+  listPublicRecordingsQuerySchema,
+} from "../schemas/recordingSchema.js";
+import { isValidObjectId } from "mongoose";
 
 // GET /api/v1/recordings - List recordings for a mosque
 export async function listRecordings(
@@ -141,6 +145,52 @@ export async function handleCallback(
   res.json({
     status: "success",
     message: "Callback received",
+  });
+}
+
+// GET /api/v1/recordings/public - List all public recordings
+export async function listPublicRecordings(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const validationResult = listPublicRecordingsQuerySchema.safeParse(req.query);
+
+  if (!validationResult.success) {
+    res.status(400).json({
+      status: "error",
+      message: "Invalid query parameters",
+      errors: validationResult.error.flatten(),
+    });
+    return;
+  }
+
+  const { limit, skip, stationId, mosqueId } = validationResult.data;
+
+  const query: any = { status: "ready" };
+
+  if (stationId) {
+    query.stationId = stationId;
+  }
+  if (mosqueId) {
+    query.mosqueId = mosqueId;
+  }
+
+  const [recordings, total] = await Promise.all([
+    Recording.find(query)
+      .populate("showId", "title hostName scheduledStart")
+      .populate("stationId", "name slug")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec(),
+    Recording.countDocuments(query).exec(),
+  ]);
+
+  res.json({
+    status: "success",
+    results: recordings.length,
+    total,
+    data: { recordings },
   });
 }
 

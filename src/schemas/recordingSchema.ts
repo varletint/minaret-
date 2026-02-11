@@ -20,3 +20,20 @@ export const recordingCallbackSchema = z.object({
 });
 
 export type RecordingCallbackInput = z.infer<typeof recordingCallbackSchema>;
+
+export const listPublicRecordingsQuerySchema = z.object({
+  limit: z.coerce.number().min(1).max(100).default(20),
+  skip: z.coerce.number().min(0).default(0),
+  stationId: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid stationId")
+    .optional(),
+  mosqueId: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid mosqueId")
+    .optional(),
+});
+
+export type ListPublicRecordingsQuery = z.infer<
+  typeof listPublicRecordingsQuerySchema
+>;

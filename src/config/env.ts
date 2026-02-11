@@ -17,6 +17,7 @@ export const env = {
     process.env.ADMIN_REFRESH_TOKEN_EXPIRES_IN || "7d",
   icecast: {
     host: process.env.ICECAST_HOST || "localhost",
+    proxyHost: process.env.ICECAST_PROXY_HOST || "localhost",
     port: parseInt(process.env.ICECAST_PORT || "8000", 10),
     adminUser: process.env.ICECAST_ADMIN_USER || "admin",
     adminPassword: process.env.ICECAST_ADMIN_PASSWORD || "hackme",

@@ -21,6 +21,9 @@ export async function triggerRecordingStart({
     startedAt: new Date(),
   });
 
+  // When sending to the VPS recorder, we want to use the internal/direct URL
+  // (localhost) because the recorder is running on the same machine as Icecast.
+  // Using the public HTTPS URL causes SSL/TLS handshake failures in FFmpeg.
   const streamUrl = `http://localhost:${env.icecast.port}${station.mountPoint}`;
 
   try {
