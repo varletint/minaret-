@@ -39,7 +39,11 @@ app.use(
     credentials: true,
   })
 );
-app.use(morgan(env.NODE_ENV === "development" ? "dev" : "combined"));
+app.use(
+  morgan(env.NODE_ENV === "development" ? "dev" : "combined", {
+    skip: (_req, res) => env.NODE_ENV === "production" && res.statusCode < 400,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

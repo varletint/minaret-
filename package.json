@@ -35,7 +35,6 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-async-handler": "^1.2.0",
-    "geoip-lite": "^1.4.10",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.4",
@@ -46,7 +45,6 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@types/geoip-lite": "^1.4.4",
     "@types/ua-parser-js": "^0.7.39"
   }
 }
