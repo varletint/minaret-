@@ -177,6 +177,7 @@ export class IcecastAuthController {
       // 1. Update Station
       station.isLive = false;
       station.currentTrack = undefined;
+      station.stats.currentListeners = 0;
       await station.save();
 
       // 2. Find active show and stop it
@@ -264,7 +265,7 @@ export class IcecastAuthController {
   //   res.end("OK");
   // }
 
-  async listenerRemove(req: Request, res: Response): Promise<void> {
+  async listenerRemove(req: Request, res: Response) {
     const { mount, client, duration } = req.body;
 
     console.log(
@@ -299,8 +300,8 @@ export class IcecastAuthController {
       console.error(`[Icecast] Error updating listener stats:`, error);
     }
 
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("OK");
+    res.set("icecast-auth-user", "1");
+    return res.status(200).send("OK");
   }
 }
 

@@ -140,6 +140,19 @@ export async function handleCallback(
     recording.error = input.error;
   }
 
+  // Auto-delete short recordings (e.g. < 1 min) to prevent clutter
+  if (recording.status === "ready" && (recording.totalDurationSecs || 0) < 60) {
+    await recording.deleteOne();
+    console.log(
+      `[Recording] Discarded short recording ${recording._id} (${recording.totalDurationSecs}s)`
+    );
+    res.json({
+      status: "success",
+      message: "Recording discarded (too short)",
+    });
+    return;
+  }
+
   await recording.save();
 
   res.json({

@@ -77,7 +77,7 @@ async function startServer() {
 
   app.listen(env.port, () => {
     console.log(`Minaret API running on port ${env.port}`);
-    console.log(`Health check: http://localhost:${env.port}/api/v1/health`);
+    // console.log(`Health check: http://localhost:${env.port}/api/v1/health`);
   });
 }
 
