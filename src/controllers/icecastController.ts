@@ -89,12 +89,13 @@ export class IcecastAuthController {
 
       // 1. Find upcoming show (within next 30 mins) or use generic title
       const now = new Date();
-      const thirtyMinsFromNow = new Date(now.getTime() + 30 * 60000);
+      const tenMinsBefore = new Date(now.getTime() - 10 * 60000);
+      const tenMinsAfter = new Date(now.getTime() + 10 * 60000);
 
       let show = await import("../models/Show.js").then(({ Show }) =>
         Show.findOne({
           stationId: station._id,
-          scheduledStart: { $gte: now, $lte: thirtyMinsFromNow },
+          scheduledStart: { $gte: tenMinsBefore, $lte: tenMinsAfter },
           isLive: false,
         }).sort({ scheduledStart: 1 })
       );
