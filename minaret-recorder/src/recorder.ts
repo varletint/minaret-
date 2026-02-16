@@ -155,9 +155,9 @@ export async function startRecording(
 
   activeSessions.set(recordingId, session);
 
-  console.log(`[${recordingId}] Starting recording...`);
-  console.log(`[${recordingId}] Stream URL: ${streamUrl}`);
-  console.log(`[${recordingId}] Session dir: ${sessionDir}`);
+  // console.log(`[${recordingId}] Starting recording...`);
+  // console.log(`[${recordingId}] Stream URL: ${streamUrl}`);
+  // console.log(`[${recordingId}] Session dir: ${sessionDir}`);
 
   const tsPattern = path.join(sessionDir, "chunk_%04d.ts");
 
@@ -191,7 +191,7 @@ export async function startRecording(
   });
 
   session.ffmpegProcess = ffmpeg;
-  console.log(`[${recordingId}] FFmpeg spawned with PID: ${ffmpeg.pid}`);
+  // console.log(`[${recordingId}] FFmpeg spawned with PID: ${ffmpeg.pid}`);
 
   ffmpeg.stderr.on("data", (data) => {
     const msg = data.toString().trim();
