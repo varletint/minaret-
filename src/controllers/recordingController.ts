@@ -21,14 +21,20 @@ export async function listRecordings(
     query.status = status;
   }
 
-  const recordings = await Recording.find(query)
-    .populate("showId", "title hostName")
-    .sort({ createdAt: -1 })
-    .limit(parseInt(limit as string, 10));
+  const parsedLimit = parseInt(limit as string, 10);
+
+  const [recordings, total] = await Promise.all([
+    Recording.find(query)
+      .populate("showId", "title hostName")
+      .sort({ createdAt: -1 })
+      .limit(parsedLimit),
+    Recording.countDocuments(query),
+  ]);
 
   res.json({
     status: "success",
     results: recordings.length,
+    total,
     data: { recordings },
   });
 }
