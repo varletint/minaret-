@@ -95,9 +95,9 @@ export class IcecastAuthController {
       let show = await import("../models/Show.js").then(({ Show }) =>
         Show.findOne({
           stationId: station._id,
-          // Match if scheduled start is within the window
+
           scheduledStart: { $gte: timeWindowStart, $lte: timeWindowEnd },
-          // AND the show hasn't effectively ended yet
+
           scheduledEnd: { $gt: now },
           isLive: false,
         }).sort({ scheduledStart: 1 })
