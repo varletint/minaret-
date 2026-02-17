@@ -103,8 +103,6 @@ export class IcecastAuthController {
         }).sort({ scheduledStart: 1 })
       );
 
-      // If no scheduled show, create an ad-hoc one?
-      // For now, let's create a "Live Stream" show if none exists
       if (!show) {
         const { Show } = await import("../models/Show.js");
         show = await Show.create({
@@ -149,7 +147,7 @@ export class IcecastAuthController {
 
       // 3. Update Station status
       station.isLive = true;
-      // station.status = "active";
+
       station.currentTrack = {
         title: show.title,
         artist: show.hostName || "Live",
