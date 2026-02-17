@@ -182,7 +182,6 @@ export class IcecastAuthController {
       station.stats.currentListeners = 0;
       await station.save();
 
-      // 2. Find active show and stop it
       const { Show } = await import("../models/Show.js");
       const show = await Show.findOne({
         stationId: station._id,
