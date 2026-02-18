@@ -9,7 +9,7 @@ function getGitLogs() {
     const sinceDate = today.toISOString();
 
     console.log(
-      `🔍 Scanning for commits since: ${today.toLocaleDateString()}...\n`
+      `Scanning for commits since: ${today.toLocaleDateString()}...\n`
     );
 
     // 2. The Magic Git Command
@@ -19,17 +19,17 @@ function getGitLogs() {
     // --name-only: Lists the files changed (Crucial context for the AI!)
     const command = `git --no-pager log --since="${sinceDate}" --pretty=format:"COMMIT: %s (%h)" --name-only`;
 
-    // 3. Execute the command
+    //  Execute the command
     const output = execSync(command).toString();
 
     if (!output.trim()) {
-      console.log("❌ No work found today. Go write some code!");
+      console.log("No work found today. Go write some code!");
       return null;
     }
 
     return output;
   } catch (error) {
-    console.error("⚠️ Error: Are you currently inside a Git repository?");
+    console.error("Error: Are you currently inside a Git repository?");
     return null;
   }
 }
@@ -38,9 +38,9 @@ function getGitLogs() {
 const rawData = getGitLogs();
 
 if (rawData) {
-  console.log("✅ CAPTURED CONTEXT:");
+  console.log("CAPTURED CONTEXT:");
   console.log("-------------------------------------------------");
   console.log(rawData);
   console.log("-------------------------------------------------");
-  console.log("🚀 READY TO SEND TO AI");
+  console.log("READY TO SEND TO AI");
 }
