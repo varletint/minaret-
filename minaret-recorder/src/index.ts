@@ -15,7 +15,7 @@ function apiKeyAuth(req: Request, res: Response, next: NextFunction): void {
   next();
 }
 
-// Health check
+
 app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok", service: "minaret-recorder" });
 });
