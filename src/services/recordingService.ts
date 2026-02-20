@@ -12,10 +12,16 @@ export async function triggerRecordingStart({
   show,
   station,
 }: StartRecordingParams): Promise<string> {
+  const recordingCount = await Recording.countDocuments({ showId: show._id });
+  const titleSuffix = recordingCount > 0 ? ` #${recordingCount + 1}` : "";
+
   const recording = await Recording.create({
     showId: show._id,
     stationId: station._id,
     mosqueId: show.mosqueId,
+    title: `${show.title}${titleSuffix}`,
+    description: show.description,
+    hostName: show.hostName,
     status: "pending",
     visibility: "public",
     startedAt: new Date(),
