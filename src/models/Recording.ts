@@ -16,6 +16,9 @@ export interface IRecording extends Document {
   showId: mongoose.Types.ObjectId;
   stationId: mongoose.Types.ObjectId;
   mosqueId: mongoose.Types.ObjectId;
+  title: string;
+  description?: string;
+  hostName?: string;
   status: "pending" | "recording" | "processing" | "ready" | "failed";
   visibility: "public" | "private";
   chunks: IRecordingChunk[];
@@ -61,6 +64,12 @@ const recordingSchema = new Schema<IRecording>(
       required: true,
       index: true,
     },
+    title: {
+      type: String,
+      required: true,
+    },
+    description: String,
+    hostName: String,
     status: {
       type: String,
       enum: ["pending", "recording", "processing", "ready", "failed"],
