@@ -23,13 +23,23 @@ export async function listRecordings(
 
   const parsedLimit = parseInt(limit as string, 10);
 
-  const [recordings, total] = await Promise.all([
+  const [recordingsRaw, total] = await Promise.all([
     Recording.find(query)
       .populate("showId", "title hostName")
       .sort({ createdAt: -1 })
-      .limit(parsedLimit),
+      .limit(parsedLimit)
+      .lean(),
     Recording.countDocuments(query),
   ]);
+
+  const recordings = recordingsRaw.map((rec: any) => {
+    if (rec.title && rec.showId) {
+      rec.showId.title = rec.title;
+      if (rec.hostName) rec.showId.hostName = rec.hostName;
+      if (rec.description) rec.showId.description = rec.description;
+    }
+    return rec;
+  });
 
   res.json({
     status: "success",
@@ -43,12 +53,21 @@ export async function listRecordings(
 export async function getRecording(req: Request, res: Response): Promise<void> {
   const { id } = req.params;
 
-  const recording = await Recording.findById(id)
+  const recordingRaw = await Recording.findById(id)
     .populate("showId", "title hostName scheduledStart")
-    .populate("stationId", "name slug");
+    .populate("stationId", "name slug")
+    .lean();
 
-  if (!recording) {
+  if (!recordingRaw) {
     throw NotFoundError("Recording not found");
+  }
+
+  const recording: any = recordingRaw;
+  if (recording.title && recording.showId) {
+    recording.showId.title = recording.title;
+    if (recording.hostName) recording.showId.hostName = recording.hostName;
+    if (recording.description)
+      recording.showId.description = recording.description;
   }
 
   res.json({
@@ -240,8 +259,8 @@ export async function listPublicRecordings(
               // Restore populated showId
               showId: {
                 _id: "$show._id",
-                title: "$show.title",
-                hostName: "$show.hostName",
+                title: { $ifNull: ["$title", "$show.title"] },
+                hostName: { $ifNull: ["$hostName", "$show.hostName"] },
                 scheduledStart: "$show.scheduledStart",
               },
               // Restore populated stationId
