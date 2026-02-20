@@ -225,7 +225,7 @@ export async function listPublicRecordings(
       },
     },
     { $unwind: "$show" },
-    { $match: { "show.title": { $ne: "Live Stream" } } },
+    // { $match: { "show.title": { $ne: "Live Stream" } } },
 
     // Sort and Paginate
     {
