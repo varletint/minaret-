@@ -155,7 +155,7 @@ export class IcecastAuthController {
       };
       await station.save();
 
-      console.log(`[Icecast] Auto-started show "${show.title}" for ${mount}`);
+      // console.log(`[Icecast] Auto-started show "${show.title}" for ${mount}`);
     } catch (error) {
       console.error(`[Icecast] Error in mountAdd:`, error);
     }
