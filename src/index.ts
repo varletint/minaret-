@@ -56,6 +56,15 @@ app.get("/api/v1/health", (_req: Request, res: Response) => {
   });
 });
 
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // API Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1", authRoutes); // For /api/v1/me
