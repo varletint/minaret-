@@ -139,14 +139,30 @@ export async function handleCallback(
 ): Promise<void> {
   const input = req.body as RecordingCallbackInput;
 
-  const recording = await Recording.findById(input.recordingId);
+  const recording = await Recording.findById(input.recordingId).populate(
+    "showId",
+    "title hostName"
+  );
   if (!recording) {
     throw NotFoundError("Recording not found");
   }
 
   if (input.chunk) {
+    const show = recording.showId as any;
+    const hostName =
+      recording.hostName || (show && show.hostName) || "Unknown_Host";
+    const title = recording.title || (show && show.title) || "Unknown_Title";
+
+    // Sanitize the strings for a clean filename
+    const cleanHost = hostName.replace(/[^a-zA-Z0-9]/g, "_");
+    const cleanTitle = title.replace(/[^a-zA-Z0-9]/g, "_");
+    const ext = input.chunk.filename.split(".").pop() || input.chunk.codec;
+
+    const customFilename = `${cleanHost}_${cleanTitle}_${input.chunk.index}.${ext}`;
+
     recording.chunks.push({
       ...input.chunk,
+      filename: customFilename,
       uploadedAt: new Date(),
     });
   }
