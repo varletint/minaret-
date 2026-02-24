@@ -1,0 +1,70 @@
+<icecast>
+  <location>Nigeria</location>
+  <admin>admins</admin>
+
+  <!-- IMPORTANT: public hostname or domain your listeners will use -->
+  <hostname>63.250.59.135</hostname>
+
+  <limits>
+    <clients>1000</clients>
+    <sources>50</sources>
+    <queue-size>524288</queue-size>
+    <header-timeout>15</header-timeout>
+    <source-timeout>10</source-timeout>
+    <burst-size>65536</burst-size>
+  </limits>
+
+  <listen-socket>
+    <port>8000</port>
+    <!-- no bind-address => listen on all interfaces -->
+  </listen-socket>
+
+  <authentication>
+    <!-- These protect admin + any mounts that do NOT have URL auth -->
+    <admin-user>admin</admin-user>
+    <admin-password>admin</admin-password>
+
+    <!-- Fallback source password for mounts without <authentication type="url"> -->
+     </authentication>
+
+ <fileserve>1</fileserve>
+  <paths>
+    <basedir>/usr/share/icecast2</basedir>
+    <logdir>/var/log/icecast2</logdir>
+    <webroot>/usr/share/icecast2/web</webroot>
+    <adminroot>/usr/share/icecast2/admin</adminroot>
+    <alias source="/" destination="/status.xsl"/>
+  </paths>
+
+  <logging>
+    <accesslog>access.log</accesslog>
+    <errorlog>error.log</errorlog>
+    <loglevel>3</loglevel>
+  </logging>
+
+  <http-headers>
+    <!-- helpful for browsers + players -->
+    <header name="Access-Control-Allow-Origin" value="*" />
+  </http-headers>
+
+  <!-- DEFAULT mount settings apply to ALL mounts that don't have an explicit <mount type="normal"> -->
+<mount type="default">
+  <authentication type="url">
+    <option name="stream_auth" value="https://minaret-production.up.railway.app/api/v1/icecast/source-auth"/>
+   <option name="mount_add"       value="https://minaret-production.up.railway.app/api/v1/icecast/mount_add"/>
+            <option name="mount_remove"    value="https://minaret-production.up.railway.app/api/v1/icecast/mount_remove"/>
+
+            <!-- Optional: Listener stats tracking -->
+            <option name="listener_add"    value="https://minaret-production.up.railway.app/api/v1/icecast/listener-add"/>
+            <option name="listener_remove" value="https://minaret-production.up.railway.app/api/v1/icecast/listener_remove"/>
+    <option name="auth_header" value="icecast-auth-user: 1"/>
+  </authentication>
+</mount>
+
+
+  <!-- Example explicit mount (optional) -->
+  <mount type="normal">
+    <mount-name>/radio.ogg</mount-name>
+    <public>1</public>
+  </mount>
+</icecast>
