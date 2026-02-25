@@ -144,7 +144,6 @@ export class IcecastAuthController {
 
       await show.save();
 
-      // 3. Update Station status
       station.isLive = true;
 
       station.currentTrack = {
@@ -153,8 +152,6 @@ export class IcecastAuthController {
         startedAt: now,
       };
       await station.save();
-
-      // console.log(`[Icecast] Auto-started show "${show.title}" for ${mount}`);
     } catch (error) {
       console.error(`[Icecast] Error in mountAdd:`, error);
     }
