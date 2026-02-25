@@ -222,44 +222,6 @@ export class IcecastAuthController {
     return res.status(200).send("OK");
   }
 
-  // async listenerAdd(req: Request, res: Response): Promise<void> {
-  //   const { mount, client, ip } = req.body;
-
-  //   console.log(
-  //     `[Icecast] Listener connected - Mount: ${mount}, Client: ${client}, IP: ${ip}`
-  //   );
-
-  //   console.log(req.body);
-
-  //   try {
-  //     const station = await Station.findOne({ mountPoint: mount });
-
-  //     if (station) {
-  //       // Increment current and total listeners
-  //       station.stats.currentListeners += 1;
-  //       station.stats.totalListeners += 1;
-
-  //       // Update peak listeners if current exceeds peak
-  //       if (station.stats.currentListeners > station.stats.peakListeners) {
-  //         station.stats.peakListeners = station.stats.currentListeners;
-  //       }
-
-  //       await station.save();
-
-  //       console.log(
-  //         `[Icecast] Station ${mount} - Current: ${station.stats.currentListeners}, Peak: ${station.stats.peakListeners}, Total: ${station.stats.totalListeners}`
-  //       );
-  //     } else {
-  //       console.log(`[Icecast] Station not found for mount: ${mount}`);
-  //     }
-  //   } catch (error) {
-  //     console.error(`[Icecast] Error updating listener stats:`, error);
-  //   }
-
-  //   res.writeHead(200, { "Content-Type": "text/plain" });
-  //   res.end("OK");
-  // }
-
   async listenerRemove(req: Request, res: Response) {
     const { mount, client, duration } = req.body;
 
