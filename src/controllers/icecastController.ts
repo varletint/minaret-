@@ -172,7 +172,6 @@ export class IcecastAuthController {
         return;
       }
 
-      // 1. Update Station
       station.isLive = false;
       station.currentTrack = undefined;
       station.stats.currentListeners = 0;
