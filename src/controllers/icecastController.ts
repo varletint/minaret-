@@ -95,10 +95,8 @@ export class IcecastAuthController {
       let show = await import("../models/Show.js").then(({ Show }) =>
         Show.findOne({
           stationId: station._id,
-
-          scheduledStart: { $gte: timeWindowStart, $lte: timeWindowEnd },
-
-          scheduledEnd: { $gt: now },
+          scheduledStart: { $lte: timeWindowEnd },
+          scheduledEnd: { $gt: timeWindowStart },
           isLive: false,
         }).sort({ scheduledStart: 1 })
       );
