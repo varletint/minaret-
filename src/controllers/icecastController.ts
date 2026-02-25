@@ -120,7 +120,6 @@ export class IcecastAuthController {
         show.actualStart = now;
       }
 
-      // 2. Start Recording
       const { triggerRecordingStart } = await import(
         "../services/recordingService.js"
       );
