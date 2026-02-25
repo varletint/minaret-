@@ -111,7 +111,7 @@ export class IcecastAuthController {
           title: "Live Stream",
           description: "Auto-started live stream",
           scheduledStart: now,
-          scheduledEnd: new Date(now.getTime() + 60 * 60000), // Default 1 hour
+          scheduledEnd: new Date(now.getTime() + 60 * 60000),
           isLive: true,
           actualStart: now,
         });
