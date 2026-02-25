@@ -187,7 +187,6 @@ export class IcecastAuthController {
         show.isLive = false;
         show.actualEnd = new Date();
 
-        // 3. Stop Recording
         if (show.recording?.recordingId) {
           const { triggerRecordingStop } = await import(
             "../services/recordingService.js"
