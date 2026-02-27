@@ -32,9 +32,9 @@ router.post(
 );
 
 // Protected routes (mosque owner)
-// GET /api/v1/recordings -
+// GET /api/v1/recordings - List recordings for a mosque
 router.get("/", authenticate, asyncHandler(listRecordings));
-// DELETE /api/v1/recordings/:id -
+// DELETE /api/v1/recordings/:id - Delete a recording
 router.delete("/:id", authenticate, asyncHandler(deleteRecording));
 
 export default router;
