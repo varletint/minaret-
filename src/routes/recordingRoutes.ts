@@ -13,7 +13,7 @@ import {
 
 const router = Router();
 
-// Public routes (for playback)
+// Public routes
 // GET /api/v1/recordings/public - List all public recordings
 router.get("/public", asyncHandler(listPublicRecordings));
 // GET /api/v1/recordings/:id - Get single recording
@@ -32,9 +32,9 @@ router.post(
 );
 
 // Protected routes (mosque owner)
-// GET /api/v1/recordings - List recordings for a mosque
+// GET /api/v1/recordings -
 router.get("/", authenticate, asyncHandler(listRecordings));
-// DELETE /api/v1/recordings/:id - Delete a recording
+// DELETE /api/v1/recordings/:id -
 router.delete("/:id", authenticate, asyncHandler(deleteRecording));
 
 export default router;
