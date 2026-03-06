@@ -50,13 +50,13 @@
   <!-- DEFAULT mount settings apply to ALL mounts that don't have an explicit <mount type="normal"> -->
 <mount type="default">
   <authentication type="url">
-    <option name="stream_auth" value="https://minaret-production.up.railway.app/api/v1/icecast/source-auth"/>
-   <option name="mount_add"       value="https://minaret-production.up.railway.app/api/v1/icecast/mount_add"/>
-            <option name="mount_remove"    value="https://minaret-production.up.railway.app/api/v1/icecast/mount_remove"/>
+    <option name="stream_auth" value="https://backminaret.vercel.app/api/v1/icecast/source-auth"/>
+   <option name="mount_add"       value="https://backminaret.vercel.app/api/v1/icecast/mount_add"/>
+            <option name="mount_remove"    value="https://backminaret.vercel.app/api/v1/icecast/mount_remove"/>
 
             <!-- Optional: Listener stats tracking -->
-            <option name="listener_add"    value="https://minaret-production.up.railway.app/api/v1/icecast/listener-add"/>
-            <option name="listener_remove" value="https://minaret-production.up.railway.app/api/v1/icecast/listener_remove"/>
+            <option name="listener_add"    value="https://backminaret.vercel.app/api/v1/icecast/listener-add"/>
+            <option name="listener_remove" value="https://backminaret.vercel.app/api/v1/icecast/listener_remove"/>
     <option name="auth_header" value="icecast-auth-user: 1"/>
   </authentication>
 </mount>
