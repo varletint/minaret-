@@ -45,6 +45,9 @@ export function errorHandler(
     // Mongoose duplicate key error
     statusCode = 409;
     message = "Duplicate entry exists";
+  } else if (err.message && err.message.includes("Not allowed by CORS")) {
+    statusCode = 403;
+    message = err.message;
   } else {
     message =
       env.NODE_ENV === "development" ? err.message : "Internal server error";
