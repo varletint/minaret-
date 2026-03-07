@@ -23,17 +23,22 @@ const app = express();
 const allowedOrigins = [
   "http://10.209.0.108:5173",
   "http://localhost:5173",
-  process.env.CLIENT_URL,
+  process.env.CLIENT_URL ? process.env.CLIENT_URL.replace(/\/$/, "") : "",
 ].filter(Boolean) as string[];
 
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
+
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      if (allowedOrigins.includes(normalizedOrigin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        console.error(`[CORS Error] Rejected Origin: ${origin}`);
+        // Log what was expected
+        console.error(`[CORS Info] Allowed Origins were:`, allowedOrigins);
+        callback(new Error(`Not allowed by CORS: ${origin}`));
       }
     },
     credentials: true,
