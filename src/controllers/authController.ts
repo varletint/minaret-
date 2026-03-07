@@ -29,7 +29,6 @@ export async function register(req: Request, res: Response): Promise<void> {
     name,
     email,
     password,
-    // location,
     contactPhone,
   });
 
