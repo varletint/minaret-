@@ -32,7 +32,6 @@ export async function logAuditEvent({
       userAgent,
     });
   } catch (error) {
-    // Fail silently to not block the main request flow, but log to console
     console.error("Failed to log audit event:", error);
   }
 }
