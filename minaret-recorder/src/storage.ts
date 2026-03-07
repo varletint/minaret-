@@ -28,7 +28,6 @@ export async function uploadToStorage(
     })
   );
 
-  // Build public URL
   const publicUrl = `${config.r2.publicUrl}/${storagePath}`;
   return publicUrl;
 }
