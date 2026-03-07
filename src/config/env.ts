@@ -7,7 +7,8 @@ export const env = {
 
   mongoUri: process.env.MONGODB_URI as string,
 
-  jwtSecret: process.env.JWT_SECRET || "default-secret-change-me",
+  jwtSecret:
+    process.env.JWT_SECRET || "i-dont-know-what-to-name-in-development",
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "15m",
   refreshTokenExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
 
