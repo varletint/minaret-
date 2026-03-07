@@ -1,6 +1,10 @@
 import express, { Request, Response, NextFunction } from "express";
 import { config } from "./config.js";
-import { startRecording, stopRecording, getSessionStatus } from "./recorder.js";
+import {
+  startRecording,
+  stopRecording,
+  getSessionStatus,
+} from "./recorder_v2.js";
 
 const app = express();
 app.use(express.json());
@@ -14,7 +18,6 @@ function apiKeyAuth(req: Request, res: Response, next: NextFunction): void {
   }
   next();
 }
-
 
 app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok", service: "minaret-recorder" });
@@ -31,10 +34,13 @@ app.post("/start", apiKeyAuth, async (req: Request, res: Response) => {
   }
 
   try {
+    const validCodecs = ["mp3", "aac", "opus", "flac"];
+    const selectedCodec = codec && validCodecs.includes(codec) ? codec : "mp3";
+
     await startRecording(
       recordingId,
       streamUrl,
-      codec || "mp3",
+      selectedCodec,
       mosqueId,
       showTitle,
       callbackUrl
@@ -51,16 +57,20 @@ app.post("/start", apiKeyAuth, async (req: Request, res: Response) => {
 });
 
 // Stop recording
-app.post("/stop/:recordingId", apiKeyAuth, (req: Request, res: Response) => {
-  const recordingId = req.params.recordingId as string;
+app.post(
+  "/stop/:recordingId",
+  apiKeyAuth,
+  async (req: Request, res: Response) => {
+    const recordingId = req.params.recordingId as string;
 
-  const stopped = stopRecording(recordingId);
-  if (stopped) {
-    res.json({ status: "ok", message: "Recording stop initiated" });
-  } else {
-    res.status(404).json({ error: "Recording not found or already stopped" });
+    const stopped = await stopRecording(recordingId);
+    if (stopped) {
+      res.json({ status: "ok", message: "Recording stop initiated" });
+    } else {
+      res.status(404).json({ error: "Recording not found or already stopped" });
+    }
   }
-});
+);
 
 // Get recording status
 app.get("/status/:recordingId", apiKeyAuth, (req: Request, res: Response) => {
